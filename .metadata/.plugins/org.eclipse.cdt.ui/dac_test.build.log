@@ -1,0 +1,10 @@
+03:28:25 **** Build of configuration Debug for project dac_test ****
+make -j8 all 
+arm-none-eabi-size   dac_test.elf 
+   text	   data	    bss	    dec	    hex	filename
+   5728	     12	   1588	   7328	   1ca0	dac_test.elf
+Finished building: default.size.stdout
+ 
+
+03:28:25 Build Finished. 0 errors, 0 warnings. (took 721ms)
+

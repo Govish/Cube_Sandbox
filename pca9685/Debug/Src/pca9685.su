@@ -1,0 +1,9 @@
+pca9685.c:24:19:pca_init	24	static
+pca9685.c:54:19:pca_reset	8	static
+pca9685.c:59:19:pca_wake	24	static
+pca9685.c:78:19:pca_sleep	24	static
+pca9685.c:92:19:pca_write_led	48	static
+pca9685.c:143:19:pca_all_off	16	static
+pca9685.c:153:6:pca_display_SOC	16	static
+pca9685.c:174:26:pca_run_event	40	static
+pca9685.c:205:19:pca_update	8	static

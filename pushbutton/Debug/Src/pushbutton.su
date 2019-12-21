@@ -1,0 +1,11 @@
+pushbutton.c:29:6:pb_init	32	static
+pushbutton.c:38:6:pb_shutdown	8	static
+pushbutton.c:49:6:pb_wake	8	static
+pushbutton.c:59:6:pb_toggle	8	static
+pushbutton.c:64:6:pb_set	8	static
+pushbutton.c:69:6:pb_clear	8	static
+pushbutton.c:75:6:pb_start_blink	16	static,ignoring_inline_asm
+pushbutton.c:84:6:pb_stop_blink	8	static
+pushbutton.c:88:10:pb_state	16	static,ignoring_inline_asm
+pushbutton.c:98:13:sampleButton	24	static
+pushbutton.c:128:6:pb_update	8	static

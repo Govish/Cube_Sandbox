@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;fusb302/pca9685.ioc&apos; to &apos;fusb302.ioc&apos;" description="Rename resource &apos;pca9685.ioc&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="pca9685.ioc" name="fusb302.ioc" stamp="1573878935887" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;usb_pd/Inc/fusb_regdefs.h&apos; to &apos;stusb_regdefs.h&apos;" description="Rename resource &apos;fusb_regdefs.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Inc/fusb_regdefs.h" name="stusb_regdefs.h" stamp="1573883420916" updateReferences="true"/>
+</session>

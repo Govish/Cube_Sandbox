@@ -1,0 +1,7 @@
+1573878345170	Delete resource 'fusb302/Src/pca9685.c'
+1573878348634	Delete resource 'fusb302/Src/led_sequence.c'
+1573878362344	Delete resource 'fusb302/Inc/led_sequence.h'
+1573878367444	Delete resource 'fusb302/Inc/pca_regs.h'
+1573878371364	Delete resource 'fusb302/Inc/pca9685.h'
+1573878943862	Delete resource 'fusb302/pca9685.elf.launch'
+1573883393971	Rename resource 'fusb302'

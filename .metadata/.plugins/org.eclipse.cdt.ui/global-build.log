@@ -1,0 +1,63 @@
+03:16:55 **** Incremental Build of configuration Debug for project usb_pd ****
+make -j8 all 
+arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
+arm-none-eabi-gcc -o "usb_pd.elf" @"objects.list"   -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\usb_pd\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="usb_pd.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: usb_pd.elf
+ 
+arm-none-eabi-objdump -h -S  usb_pd.elf  > "usb_pd.list"
+arm-none-eabi-size   usb_pd.elf 
+   text	   data	    bss	    dec	    hex	filename
+  17096	    112	   1784	  18992	   4a30	usb_pd.elf
+Finished building: default.size.stdout
+ 
+Finished building: usb_pd.list
+ 
+03:28:25 **** Build of configuration Debug for project dac_test ****
+make -j8 all 
+arm-none-eabi-size   dac_test.elf 
+   text	   data	    bss	    dec	    hex	filename
+   5728	     12	   1588	   7328	   1ca0	dac_test.elf
+Finished building: default.size.stdout
+ 
+03:28:25 **** Build of configuration Debug for project i2c_scanner ****
+make -j8 all 
+arm-none-eabi-size   i2c_scanner.elf 
+   text	   data	    bss	    dec	    hex	filename
+  14748	    112	   1776	  16636	   40fc	i2c_scanner.elf
+Finished building: default.size.stdout
+ 
+03:28:26 **** Incremental Build of configuration Debug for project pca9685 ****
+make -j8 all 
+arm-none-eabi-size   pca9685.elf 
+   text	   data	    bss	    dec	    hex	filename
+  21432	    140	   1852	  23424	   5b80	pca9685.elf
+Finished building: default.size.stdout
+ 
+03:28:27 **** Build of configuration Debug for project printf ****
+make -j8 all 
+arm-none-eabi-size   printf.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10924	    112	   1696	  12732	   31bc	printf.elf
+Finished building: default.size.stdout
+ 
+03:28:28 **** Build of configuration Debug for project pushbutton ****
+make -j8 all 
+arm-none-eabi-size   pushbutton.elf 
+   text	   data	    bss	    dec	    hex	filename
+  14476	    112	   1800	  16388	   4004	pushbutton.elf
+Finished building: default.size.stdout
+ 
+03:28:28 **** Incremental Build of configuration Debug for project usb_pd ****
+make -j8 all 
+arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
+arm-none-eabi-gcc -o "usb_pd.elf" @"objects.list"   -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\usb_pd\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="usb_pd.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: usb_pd.elf
+ 
+arm-none-eabi-objdump -h -S  usb_pd.elf  > "usb_pd.list"
+arm-none-eabi-size   usb_pd.elf 
+   text	   data	    bss	    dec	    hex	filename
+  17096	    112	   1784	  18992	   4a30	usb_pd.elf
+Finished building: default.size.stdout
+ 
+Finished building: usb_pd.list
+ 

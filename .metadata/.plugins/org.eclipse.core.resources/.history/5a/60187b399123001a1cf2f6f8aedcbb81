@@ -1,0 +1,11 @@
+#ifndef STUSB4500_H
+#define STUSB4500_H
+
+
+
+
+// =========== Public Functions ============
+HAL_StatusTypeDef init();
+
+
+#endif

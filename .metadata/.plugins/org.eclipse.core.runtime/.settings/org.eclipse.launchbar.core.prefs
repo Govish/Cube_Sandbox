@@ -1,0 +1,9 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:dac_test.elf,org.eclipse.launchbar.core.descriptorType.default\:i2c_scanner.elf,org.eclipse.launchbar.core.descriptorType.default\:printf.elf,org.eclipse.launchbar.core.descriptorType.default\:pushbutton.elf,org.eclipse.launchbar.core.descriptorType.default\:pca9685.elf,org.eclipse.launchbar.core.descriptorType.default\:usb_pd.elf
+eclipse.preferences.version=1
+org.eclipse.launchbar.core.descriptorType.default\:Blink_Reset_Test.elf/activeLaunchMode=debug
+org.eclipse.launchbar.core.descriptorType.default\:Blink_Reset_Test.elf/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:dac_test.elf/activeLaunchMode=debug
+org.eclipse.launchbar.core.descriptorType.default\:dac_test.elf/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
