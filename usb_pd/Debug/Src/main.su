@@ -1,5 +1,5 @@
 printf_override.h:9:5:_write	40	static
-main.c:72:5:main	16	static
-main.c:134:6:SystemClock_Config	112	static
-main.c:170:6:HAL_GPIO_EXTI_Callback	40	static
-main.c:205:6:Error_Handler	8	static
+main.c:114:5:main	16	static
+main.c:176:6:SystemClock_Config	112	static
+main.c:212:6:HAL_GPIO_EXTI_Callback	40	static
+main.c:247:6:Error_Handler	8	static

@@ -501,7 +501,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
  .debug_line    0x0000000000000000      0xb69 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
- .debug_str     0x0000000000000000    0x741b5 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
+ .debug_str     0x0000000000000000    0x741b3 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
  .debug_frame   0x0000000000000000      0x1d0 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_dma.o
  .ARM.attributes
@@ -662,7 +662,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
  .debug_line    0x0000000000000000      0xb19 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
- .debug_str     0x0000000000000000    0x74098 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
+ .debug_str     0x0000000000000000    0x74096 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
  .debug_frame   0x0000000000000000      0x1c4 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash.o
  .ARM.attributes
@@ -828,7 +828,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
  .debug_line    0x0000000000000000      0xb93 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
- .debug_str     0x0000000000000000    0x74218 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
+ .debug_str     0x0000000000000000    0x74216 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
  .debug_frame   0x0000000000000000      0x220 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_flash_ex.o
  .ARM.attributes
@@ -1490,7 +1490,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
  .debug_line    0x0000000000000000      0xa66 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
- .debug_str     0x0000000000000000    0x73f58 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
+ .debug_str     0x0000000000000000    0x73f56 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
  .debug_frame   0x0000000000000000      0x170 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.o
  .ARM.attributes
@@ -1641,7 +1641,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
  .debug_line    0x0000000000000000      0xa08 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
- .debug_str     0x0000000000000000    0x73f11 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
+ .debug_str     0x0000000000000000    0x73f0f Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
  .debug_frame   0x0000000000000000      0x110 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.o
  .ARM.attributes
@@ -2053,7 +2053,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
  .debug_line    0x0000000000000000      0x954 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
- .debug_str     0x0000000000000000    0x73d63 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
+ .debug_str     0x0000000000000000    0x73d61 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
  .ARM.attributes
                 0x0000000000000000       0x31 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.o
@@ -2184,7 +2184,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
  .debug_line    0x0000000000000000      0x957 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
- .debug_str     0x0000000000000000    0x73d66 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
+ .debug_str     0x0000000000000000    0x73d64 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
  .ARM.attributes
                 0x0000000000000000       0x31 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o
@@ -2555,7 +2555,7 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
  .debug_macro   0x0000000000000000      0x129 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
  .debug_line    0x0000000000000000      0xac3 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
- .debug_str     0x0000000000000000    0x74393 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
+ .debug_str     0x0000000000000000    0x74391 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
  .comment       0x0000000000000000       0x7c Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
  .debug_frame   0x0000000000000000      0x130 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart_ex.o
  .ARM.attributes
@@ -3189,6 +3189,184 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x209 Src/stm32f0xx_it.o
  .debug_macro   0x0000000000000000      0x129 Src/stm32f0xx_it.o
  .debug_macro   0x0000000000000000       0x3a Src/stm32f0xx_it.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .group         0x0000000000000000        0xc Src/stusb4500.o
+ .text          0x0000000000000000        0x0 Src/stusb4500.o
+ .data          0x0000000000000000        0x0 Src/stusb4500.o
+ .bss           0x0000000000000000        0x0 Src/stusb4500.o
+ .bss.num_source_pdos
+                0x0000000000000000        0x1 Src/stusb4500.o
+ .bss.source_pdos
+                0x0000000000000000       0x40 Src/stusb4500.o
+ .bss.pdo_received
+                0x0000000000000000        0x1 Src/stusb4500.o
+ .bss.accept_received
+                0x0000000000000000        0x1 Src/stusb4500.o
+ .bss.reject_received
+                0x0000000000000000        0x1 Src/stusb4500.o
+ .bss.attached  0x0000000000000000        0x1 Src/stusb4500.o
+ .text.pd_init  0x0000000000000000       0xb0 Src/stusb4500.o
+ .text.pd_soft_reset
+                0x0000000000000000       0x66 Src/stusb4500.o
+ .text.pd_send_soft_reset
+                0x0000000000000000       0x38 Src/stusb4500.o
+ .text.pd_read_sink_pdos
+                0x0000000000000000      0x160 Src/stusb4500.o
+ .text.pd_get_source_pdos
+                0x0000000000000000       0x54 Src/stusb4500.o
+ .text.pd_read_rdo
+                0x0000000000000000       0x52 Src/stusb4500.o
+ .text.pd_update_sink_pdo
+                0x0000000000000000       0x88 Src/stusb4500.o
+ .text.pd_update_num_pdos
+                0x0000000000000000       0x42 Src/stusb4500.o
+ .text.pd_typec_info
+                0x0000000000000000       0x1e Src/stusb4500.o
+ .text.pd_request_pdo_num
+                0x0000000000000000       0x90 Src/stusb4500.o
+ .text.pd_attached
+                0x0000000000000000       0x14 Src/stusb4500.o
+ .rodata        0x0000000000000000       0x5a Src/stusb4500.o
+ .text.pd_onAttach
+                0x0000000000000000       0x8c Src/stusb4500.o
+ .text.pd_onDetach
+                0x0000000000000000       0x50 Src/stusb4500.o
+ .text.pd_onAlert
+                0x0000000000000000        0xc Src/stusb4500.o
+ .debug_info    0x0000000000000000     0x14a9 Src/stusb4500.o
+ .debug_abbrev  0x0000000000000000      0x291 Src/stusb4500.o
+ .debug_aranges
+                0x0000000000000000       0x88 Src/stusb4500.o
+ .debug_ranges  0x0000000000000000       0x78 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x322 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0xa48 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0xab Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x2e Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x22 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x22 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x8e Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x51 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0xef Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x6a Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x1df Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x34 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x26 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x30d Src/stusb4500.o
+ .debug_macro   0x0000000000000000     0xfe50 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x3c Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x46 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x18 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x3c Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x34 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x16 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x97 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x330 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0xfd Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x10 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x52 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x1f Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x43 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x20 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x1a3 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x10 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x1c Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x52 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x40 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x10 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x40 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0xd7 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x1c Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x3d Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x16 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x145 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x50 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x951 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x5f3 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x13a Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x1a7 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x22c Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x34 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x43 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x28 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0xb6 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x217 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x202 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x61 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x90 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x4d Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x16d Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x38a Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x209 Src/stusb4500.o
+ .debug_macro   0x0000000000000000      0x129 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x70 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x22 Src/stusb4500.o
+ .debug_macro   0x0000000000000000       0x40 Src/stusb4500.o
+ .debug_line    0x0000000000000000      0xb6c Src/stusb4500.o
+ .debug_str     0x0000000000000000    0x747ec Src/stusb4500.o
+ .comment       0x0000000000000000       0x7c Src/stusb4500.o
+ .debug_frame   0x0000000000000000      0x1dc Src/stusb4500.o
+ .ARM.attributes
+                0x0000000000000000       0x31 Src/stusb4500.o
  .group         0x0000000000000000        0xc Src/syscalls.o
  .group         0x0000000000000000        0xc Src/syscalls.o
  .group         0x0000000000000000        0xc Src/syscalls.o
@@ -3817,6 +3995,7 @@ LOAD Src/i2c.o
 LOAD Src/main.o
 LOAD Src/stm32f0xx_hal_msp.o
 LOAD Src/stm32f0xx_it.o
+LOAD Src/stusb4500.o
 LOAD Src/syscalls.o
 LOAD Src/sysmem.o
 LOAD Src/system_stm32f0xx.o
@@ -4572,7 +4751,7 @@ OUTPUT(usb_pd.elf elf32-littlearm)
  .debug_ranges  0x0000000000000860       0x20 Src/usart.o
  .debug_ranges  0x0000000000000880       0x20 Startup/startup_stm32f072rbtx.o
 
-.debug_macro    0x0000000000000000    0x18485
+.debug_macro    0x0000000000000000    0x184a3
  .debug_macro   0x0000000000000000      0x317 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
  .debug_macro   0x0000000000000317      0xa48 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
  .debug_macro   0x0000000000000d5f       0xab Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
@@ -4644,37 +4823,37 @@ OUTPUT(usb_pd.elf elf32-littlearm)
  .debug_macro   0x0000000000015ca5       0x3a Src/gpio.o
  .debug_macro   0x0000000000015cdf      0x30c Src/i2c.o
  .debug_macro   0x0000000000015feb      0x369 Src/main.o
- .debug_macro   0x0000000000016354       0x52 Src/main.o
- .debug_macro   0x00000000000163a6       0x10 Src/main.o
- .debug_macro   0x00000000000163b6      0x241 Src/main.o
- .debug_macro   0x00000000000165f7       0x16 Src/main.o
- .debug_macro   0x000000000001660d       0x35 Src/main.o
- .debug_macro   0x0000000000016642      0x51a Src/main.o
- .debug_macro   0x0000000000016b5c       0x22 Src/main.o
- .debug_macro   0x0000000000016b7e      0x302 Src/stm32f0xx_hal_msp.o
- .debug_macro   0x0000000000016e80      0x30c Src/stm32f0xx_it.o
- .debug_macro   0x000000000001718c      0x243 Src/syscalls.o
- .debug_macro   0x00000000000173cf       0x40 Src/syscalls.o
- .debug_macro   0x000000000001740f       0x94 Src/syscalls.o
- .debug_macro   0x00000000000174a3       0x57 Src/syscalls.o
- .debug_macro   0x00000000000174fa      0x174 Src/syscalls.o
- .debug_macro   0x000000000001766e       0x10 Src/syscalls.o
- .debug_macro   0x000000000001767e       0x10 Src/syscalls.o
- .debug_macro   0x000000000001768e       0x10 Src/syscalls.o
- .debug_macro   0x000000000001769e       0x35 Src/syscalls.o
- .debug_macro   0x00000000000176d3      0x122 Src/syscalls.o
- .debug_macro   0x00000000000177f5       0x16 Src/syscalls.o
- .debug_macro   0x000000000001780b       0x16 Src/syscalls.o
- .debug_macro   0x0000000000017821       0x29 Src/syscalls.o
- .debug_macro   0x000000000001784a       0x1c Src/syscalls.o
- .debug_macro   0x0000000000017866       0x10 Src/syscalls.o
- .debug_macro   0x0000000000017876      0x189 Src/syscalls.o
- .debug_macro   0x00000000000179ff       0x16 Src/syscalls.o
- .debug_macro   0x0000000000017a15       0x88 Src/syscalls.o
- .debug_macro   0x0000000000017a9d      0x1ae Src/sysmem.o
- .debug_macro   0x0000000000017c4b      0x23b Src/sysmem.o
- .debug_macro   0x0000000000017e86      0x2f3 Src/system_stm32f0xx.o
- .debug_macro   0x0000000000018179      0x30c Src/usart.o
+ .debug_macro   0x0000000000016354       0x70 Src/main.o
+ .debug_macro   0x00000000000163c4       0x10 Src/main.o
+ .debug_macro   0x00000000000163d4      0x241 Src/main.o
+ .debug_macro   0x0000000000016615       0x16 Src/main.o
+ .debug_macro   0x000000000001662b       0x35 Src/main.o
+ .debug_macro   0x0000000000016660      0x51a Src/main.o
+ .debug_macro   0x0000000000016b7a       0x22 Src/main.o
+ .debug_macro   0x0000000000016b9c      0x302 Src/stm32f0xx_hal_msp.o
+ .debug_macro   0x0000000000016e9e      0x30c Src/stm32f0xx_it.o
+ .debug_macro   0x00000000000171aa      0x243 Src/syscalls.o
+ .debug_macro   0x00000000000173ed       0x40 Src/syscalls.o
+ .debug_macro   0x000000000001742d       0x94 Src/syscalls.o
+ .debug_macro   0x00000000000174c1       0x57 Src/syscalls.o
+ .debug_macro   0x0000000000017518      0x174 Src/syscalls.o
+ .debug_macro   0x000000000001768c       0x10 Src/syscalls.o
+ .debug_macro   0x000000000001769c       0x10 Src/syscalls.o
+ .debug_macro   0x00000000000176ac       0x10 Src/syscalls.o
+ .debug_macro   0x00000000000176bc       0x35 Src/syscalls.o
+ .debug_macro   0x00000000000176f1      0x122 Src/syscalls.o
+ .debug_macro   0x0000000000017813       0x16 Src/syscalls.o
+ .debug_macro   0x0000000000017829       0x16 Src/syscalls.o
+ .debug_macro   0x000000000001783f       0x29 Src/syscalls.o
+ .debug_macro   0x0000000000017868       0x1c Src/syscalls.o
+ .debug_macro   0x0000000000017884       0x10 Src/syscalls.o
+ .debug_macro   0x0000000000017894      0x189 Src/syscalls.o
+ .debug_macro   0x0000000000017a1d       0x16 Src/syscalls.o
+ .debug_macro   0x0000000000017a33       0x88 Src/syscalls.o
+ .debug_macro   0x0000000000017abb      0x1ae Src/sysmem.o
+ .debug_macro   0x0000000000017c69      0x23b Src/sysmem.o
+ .debug_macro   0x0000000000017ea4      0x2f3 Src/system_stm32f0xx.o
+ .debug_macro   0x0000000000018197      0x30c Src/usart.o
 
 .debug_line     0x0000000000000000     0xc404
  .debug_line    0x0000000000000000      0xacd Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
@@ -4696,43 +4875,43 @@ OUTPUT(usb_pd.elf elf32-littlearm)
  .debug_line    0x000000000000b9f5      0x98a Src/usart.o
  .debug_line    0x000000000000c37f       0x85 Startup/startup_stm32f072rbtx.o
 
-.debug_str      0x0000000000000000    0x78e16
- .debug_str     0x0000000000000000    0x73fdf Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
-                                      0x74305 (size before relaxing)
- .debug_str     0x0000000000073fdf      0x220 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.o
-                                      0x741ef (size before relaxing)
- .debug_str     0x00000000000741ff      0x294 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.o
-                                      0x7407f (size before relaxing)
- .debug_str     0x0000000000074493     0x118f Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.o
-                                      0x74f9f (size before relaxing)
- .debug_str     0x0000000000075622       0xf3 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c_ex.o
-                                      0x7437b (size before relaxing)
- .debug_str     0x0000000000075715      0x345 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.o
-                                      0x741c7 (size before relaxing)
- .debug_str     0x0000000000075a5a      0x3aa Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.o
-                                      0x741cf (size before relaxing)
- .debug_str     0x0000000000075e04      0x8cf Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.o
-                                      0x74910 (size before relaxing)
- .debug_str     0x00000000000766d3      0x10f Src/gpio.o
-                                      0x74104 (size before relaxing)
- .debug_str     0x00000000000767e2       0xcd Src/i2c.o
-                                      0x74488 (size before relaxing)
- .debug_str     0x00000000000768af     0x16a3 Src/main.o
-                                      0x75e36 (size before relaxing)
- .debug_str     0x0000000000077f52       0x1b Src/stm32f0xx_hal_msp.o
-                                      0x73e86 (size before relaxing)
- .debug_str     0x0000000000077f6d       0x84 Src/stm32f0xx_it.o
-                                      0x73e9d (size before relaxing)
- .debug_str     0x0000000000077ff1      0xd5a Src/syscalls.o
-                                       0x87d6 (size before relaxing)
- .debug_str     0x0000000000078d4b       0x31 Src/sysmem.o
-                                       0x7a2f (size before relaxing)
- .debug_str     0x0000000000078d7c       0x3b Src/system_stm32f0xx.o
-                                      0x73dd8 (size before relaxing)
- .debug_str     0x0000000000078db7       0x2e Src/usart.o
-                                      0x743bd (size before relaxing)
- .debug_str     0x0000000000078de5       0x31 Startup/startup_stm32f072rbtx.o
-                                         0x5a (size before relaxing)
+.debug_str      0x0000000000000000    0x78e7c
+ .debug_str     0x0000000000000000    0x73fdd Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o
+                                      0x74303 (size before relaxing)
+ .debug_str     0x0000000000073fdd      0x220 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.o
+                                      0x741ed (size before relaxing)
+ .debug_str     0x00000000000741fd      0x294 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.o
+                                      0x7407d (size before relaxing)
+ .debug_str     0x0000000000074491     0x118f Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.o
+                                      0x74f9d (size before relaxing)
+ .debug_str     0x0000000000075620       0xf3 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c_ex.o
+                                      0x74379 (size before relaxing)
+ .debug_str     0x0000000000075713      0x345 Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.o
+                                      0x741c5 (size before relaxing)
+ .debug_str     0x0000000000075a58      0x3aa Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.o
+                                      0x741cd (size before relaxing)
+ .debug_str     0x0000000000075e02      0x8cf Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.o
+                                      0x7490e (size before relaxing)
+ .debug_str     0x00000000000766d1      0x10f Src/gpio.o
+                                      0x74102 (size before relaxing)
+ .debug_str     0x00000000000767e0       0xcd Src/i2c.o
+                                      0x74486 (size before relaxing)
+ .debug_str     0x00000000000768ad     0x170b Src/main.o
+                                      0x75e9c (size before relaxing)
+ .debug_str     0x0000000000077fb8       0x1b Src/stm32f0xx_hal_msp.o
+                                      0x73e84 (size before relaxing)
+ .debug_str     0x0000000000077fd3       0x84 Src/stm32f0xx_it.o
+                                      0x73e9b (size before relaxing)
+ .debug_str     0x0000000000078057      0xd5a Src/syscalls.o
+                                       0x87d4 (size before relaxing)
+ .debug_str     0x0000000000078db1       0x31 Src/sysmem.o
+                                       0x7a2d (size before relaxing)
+ .debug_str     0x0000000000078de2       0x3b Src/system_stm32f0xx.o
+                                      0x73dd6 (size before relaxing)
+ .debug_str     0x0000000000078e1d       0x2e Src/usart.o
+                                      0x743bb (size before relaxing)
+ .debug_str     0x0000000000078e4b       0x31 Startup/startup_stm32f072rbtx.o
+                                         0x58 (size before relaxing)
 
 .comment        0x0000000000000000       0x7b
  .comment       0x0000000000000000       0x7b Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.o

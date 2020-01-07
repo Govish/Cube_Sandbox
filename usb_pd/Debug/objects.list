@@ -19,6 +19,7 @@
 "Src/main.o"
 "Src/stm32f0xx_hal_msp.o"
 "Src/stm32f0xx_it.o"
+"Src/stusb4500.o"
 "Src/syscalls.o"
 "Src/sysmem.o"
 "Src/system_stm32f0xx.o"

@@ -52,8 +52,8 @@ Blink_Reset_Test.list \
 all: Blink_Reset_Test.elf secondary-outputs
 
 # Tool invocations
-Blink_Reset_Test.elf: $(OBJS) $(USER_OBJS) D:\Documents\STM32\ Projects\Blink_Reset_Test\STM32F072RBTX_FLASH.ld
-	arm-none-eabi-g++ -o "Blink_Reset_Test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\Blink_Reset_Test\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Blink_Reset_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Blink_Reset_Test.elf: $(OBJS) $(USER_OBJS) D:\Documents\Cube_Sandbox\Blink_Reset_Test\STM32F072RBTX_FLASH.ld
+	arm-none-eabi-g++ -o "Blink_Reset_Test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\Blink_Reset_Test\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Blink_Reset_Test.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

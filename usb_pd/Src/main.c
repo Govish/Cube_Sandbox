@@ -1,4 +1,46 @@
 /* USER CODE BEGIN Header */
+
+/*
+ * The general idea of this program is to test/negotiate different USB PD power levels
+ * This is how we'll do it:
+ * IN AN INTERRUPT CONTEXT
+ * 		- when the attach line goes low, we'll call the pd_onAttach() function
+ * 			- this initializes the STUSB4500 and asserts an internal flag *
+ * 		- when the alert line goes low, we'll call the pd_onAlert() function
+ * 			- follow the instructions taken from the sample code
+ * 			- update the flag variables as appropriate
+ *
+ *	IN THE MAIN LOOP:
+ *		- when we're not attached, we'll sit in an idle loop (checked by reading pd_attached())
+ *			- simple conditional
+ *		- on the rising edge of attached
+ *			- call pd_auto_nego()
+ *			- THIS IS A BLOCKING CALL (which should be fine depending on how we structure our code)
+ *				- may need to set a timeout in here
+ * 		- once we're properly attached and operating on a PDO
+ * 			- check every now and then that the RDO that we have is valid
+ * 			- read the attach line to check if we're still attached (if we somehow missed the rising edge)
+ * 			- check the attached
+ * 				- if any one of these are false, call the pd_onDetach() function
+ * 		- on the falling edge of attached
+ * 			- don't think we need to do anything here
+ *
+ *	THE pd_auto_nego WORKS BY:
+ *		- clearing the pdo_received flag
+ *		- send a soft_reset command
+ *		- waiting (WITH A TIMEOUT) until the pdo_received flag goes high
+ *			- might retry the soft reset a couple times if we don't receive PDOs, we'll see
+ *		- check all the PDOs, see which one matches the best
+ *		- reset the accept_received flag
+ *		- select that particular PDO by calling the pd_request_pdo_index() function
+ *		- waiting (WITH A TIMEOUT) until the accept_received or reject_received flag goes high
+ *			- will retry the negotiation a couple times if we timeout or get a reject message
+ *		- update the pointer variables with the voltage, current, and power negotiated
+ *
+ * 	IN THE EVENT THAT WE GET ANY SORT OF I2C FAILURE
+ * 		- uhhhh honestly not sure, need to think about this more
+ */
+
 /**
   ******************************************************************************
   * @file           : main.c

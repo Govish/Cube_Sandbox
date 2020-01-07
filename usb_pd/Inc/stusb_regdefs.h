@@ -9,10 +9,29 @@
 #define ALERT_STATUS_1_REG 0x0B
 #define PORT_STATUS_0_REG 0x0D
 #define PORT_STATUS_1_REG 0x0E
+#define PS1_CONNECTION_BITS 0xE0 //top 3 bits in the port status 1 register tell us the type of device the port is connected to
+#define ATTACHED_SOURCE 0x40 //value of the top 3 bits of the PORT_STATUS_1 register if we're attached to a source
+
+#define TYPEC_MON_STATUS_0_REG 0x0F
+#define TYPEC_MON_STATUS_1_REG 0x10
+/*
+ * TODO: add more TCMON reg stuff in here
+ */
+
+#define CC_FAULT_STATUS_0_REG 0x12
+#define CC_FAULT_STATUS_1_REG 0x13
+/*
+ * TODO add more CC_HW_FAULT reg stuff in here if necessary
+ */
+
+#define PROTOCOL_STATUS_REG 0x16
+#define PRTL_MESSAGE_RECEIVED (1<<2)
 
 #define RESET_CTRL_REG 0x23
 #define TX_HEADER_REG 0x51
 #define STUSB_GEN1S_CMD_CTRL_REG 0x1A
+
+#define RX_HEADER_REG 0x31 //2 registers starting here
 
 #define DPM_PDO_NUMB_REG 0x70
 #define DPM_SNK_PDO1 0x85
@@ -128,7 +147,7 @@
 typedef union {
     uint8_t data;
     struct {
-        //union goes from LSB -> MSB
+        //struct goes from LSB -> MSB
         uint8_t cc1 : 2; //cc1 state information
         uint8_t cc2 : 2; //cc2 state information
         uint8_t conn_res: 1; //connection result
@@ -204,6 +223,26 @@ https://www.embedded.com/usb-type-c-and-power-delivery-101-power-delivery-protoc
                     01111: VENDOR_DEFINED
 
 */
+
+typedef union {
+    uint16_t data;
+    struct {
+        uint8_t message_type : 5; //bits 4:0
+        uint8_t data_role : 1; //bit 5
+        uint8_t spec_rev : 2; //bits 7:6
+        uint8_t pwr_role : 1; //bit 8
+        uint8_t message_id : 3; //bits 11:9
+        uint8_t num_objects : 3; //bits 14:12
+        uint8_t ext_flag : 1; //bit 15
+    } map;
+} PDHeaderTypedef;
+
+//#define CONTROL_GOTOMIN 0x02
+#define CONTROL_ACCEPT 0x03
+#define CONTROL_REJECT 0x04
+#define CONTROL_PSRDY 0x06
+
+#define DATA_SOURCECAP 0x01
 
 /*
 void hardware_reset()

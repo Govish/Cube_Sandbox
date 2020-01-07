@@ -37,8 +37,8 @@ dac_test.list \
 all: dac_test.elf secondary-outputs
 
 # Tool invocations
-dac_test.elf: $(OBJS) $(USER_OBJS) D:\Documents\STM32\ Projects\dac_test\STM32F072RBTX_FLASH.ld
-	arm-none-eabi-gcc -o "dac_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\dac_test\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="dac_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+dac_test.elf: $(OBJS) $(USER_OBJS) D:\Documents\Cube_Sandbox\dac_test\STM32F072RBTX_FLASH.ld
+	arm-none-eabi-gcc -o "dac_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\dac_test\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="dac_test.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

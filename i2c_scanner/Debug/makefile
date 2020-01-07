@@ -37,8 +37,8 @@ i2c_scanner.list \
 all: i2c_scanner.elf secondary-outputs
 
 # Tool invocations
-i2c_scanner.elf: $(OBJS) $(USER_OBJS) D:\Documents\STM32\ Projects\i2c_scanner\STM32F072RBTX_FLASH.ld
-	arm-none-eabi-gcc -o "i2c_scanner.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\i2c_scanner\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="i2c_scanner.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+i2c_scanner.elf: $(OBJS) $(USER_OBJS) D:\Documents\Cube_Sandbox\i2c_scanner\STM32F072RBTX_FLASH.ld
+	arm-none-eabi-gcc -o "i2c_scanner.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\i2c_scanner\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="i2c_scanner.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

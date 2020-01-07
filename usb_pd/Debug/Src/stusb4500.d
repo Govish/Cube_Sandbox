@@ -1,5 +1,4 @@
-Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o: \
- ../Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c \
+Src/stusb4500.o: ../Src/stusb4500.c ../Inc/stusb4500.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h \
  ../Inc/stm32f0xx_hal_conf.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc.h \
@@ -22,7 +21,12 @@ Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o: \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_i2c.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_i2c_ex.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr.h \
- ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr_ex.h
+ ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr_ex.h \
+ ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h \
+ ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h \
+ ../Inc/stusb_regdefs.h ../Inc/i2c.h ../Inc/main.h
+
+../Inc/stusb4500.h:
 
 ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h:
 
@@ -69,3 +73,13 @@ Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.o: \
 ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr.h:
 
 ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr_ex.h:
+
+../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h:
+
+../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h:
+
+../Inc/stusb_regdefs.h:
+
+../Inc/i2c.h:
+
+../Inc/main.h:

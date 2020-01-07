@@ -9,6 +9,7 @@ C_SRCS += \
 ../Src/main.c \
 ../Src/stm32f0xx_hal_msp.c \
 ../Src/stm32f0xx_it.c \
+../Src/stusb4500.c \
 ../Src/syscalls.c \
 ../Src/sysmem.c \
 ../Src/system_stm32f0xx.c \
@@ -20,6 +21,7 @@ OBJS += \
 ./Src/main.o \
 ./Src/stm32f0xx_hal_msp.o \
 ./Src/stm32f0xx_it.o \
+./Src/stusb4500.o \
 ./Src/syscalls.o \
 ./Src/sysmem.o \
 ./Src/system_stm32f0xx.o \
@@ -31,6 +33,7 @@ C_DEPS += \
 ./Src/main.d \
 ./Src/stm32f0xx_hal_msp.d \
 ./Src/stm32f0xx_it.d \
+./Src/stusb4500.d \
 ./Src/syscalls.d \
 ./Src/sysmem.d \
 ./Src/system_stm32f0xx.d \
@@ -48,6 +51,8 @@ Src/stm32f0xx_hal_msp.o: ../Src/stm32f0xx_hal_msp.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/stm32f0xx_hal_msp.d" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 Src/stm32f0xx_it.o: ../Src/stm32f0xx_it.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/stm32f0xx_it.d" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
+Src/stusb4500.o: ../Src/stusb4500.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/stusb4500.d" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 Src/syscalls.o: ../Src/syscalls.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m0 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F072xB -DDEBUG -c -I../Inc -I../Drivers/STM32F0xx_HAL_Driver/Inc -I../Drivers/CMSIS/Include -I../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F0xx/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/syscalls.d" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 Src/sysmem.o: ../Src/sysmem.c
