@@ -33,6 +33,8 @@
 
 #define RX_HEADER_REG 0x31 //2 registers starting here
 
+#define RX_DATA_OBJ_REG 0x33 //a bunch of registers starting here (28 regs in total)
+
 #define DPM_PDO_NUMB_REG 0x70
 #define DPM_SNK_PDO1 0x85
 #define DPM_SNK_PDO2 0x89

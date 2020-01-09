@@ -95,7 +95,7 @@ HAL_StatusTypeDef pd_read_sink_pdos(uint8_t* num_pdos, PDOTypedef* pdos) {
 	for(int i = 0; i < *num_pdos; i++) {
 		//the earlier indices correspond to the earlier registers
 		//and each PDO is 32 bits, so we'll concatenate 4 registers together
-		pdos[i].data = pdo_data[i<<2] | pdo_data[1+(i<<2)] << 8 | pdo_data[2+(i<<2)] << 16 | pdo_data[3+(i<<2)] << 24;
+		pdos[i].data = pdo_data[i<<2] | (pdo_data[1+(i<<2)] << 8) | (pdo_data[2+(i<<2)] << 16) | (pdo_data[3+(i<<2)] << 24);
 	}
 	return status;
 }
@@ -165,7 +165,9 @@ HAL_StatusTypeDef pd_request_pdo_num(uint8_t pdo_index) {
 
 	//read the PDO at our index
 	PDOTypedef PDO_to_request;
-	PDO_to_request = source_pdos[pdo_index];
+	PDO_to_request = source_pdos[pdo_index-1];
+
+	printf("Requesting this PDO: 0x%lx\n", PDO_to_request.data);
 
 	//write that PDO to index 2 and set the number of PDOs to 2
 	status = pd_update_sink_pdo(2, &PDO_to_request);
@@ -189,8 +191,8 @@ HAL_StatusTypeDef pd_onAttach() {
 	HAL_StatusTypeDef status;
 
 	//perform a register soft reset of the chip
-	status = pd_soft_reset();
-	if(status != HAL_OK) return status;
+	//status = pd_soft_reset();
+	//if(status != HAL_OK) return status;
 
 	//read from the PORT_STATUS_1 register to make sure we're connected to a source
 	uint8_t ps1_reg;
@@ -213,37 +215,39 @@ HAL_StatusTypeDef pd_onAttach() {
 
 HAL_StatusTypeDef pd_onDetach() {
 	//just reset the flags and stuff on the detach event
-	attached = false;
-	num_source_pdos = 0;
-	for(int i = 0; i < 8; i++) source_pdos[i].data = 0;
-	printf("Detached!\n");
-
+	if(attached == true) {
+		attached = false;
+		num_source_pdos = 0;
+		for(int i = 0; i < 8; i++) source_pdos[i].data = 0;
+		printf("Detached!\n");
+	}
 	return HAL_OK;
 }
 
-/* TODO: write a function that can be called from an interrupt context to respond to different PD alerts */
 HAL_StatusTypeDef pd_onAlert() {
+	if(!attached) return HAL_OK; //just return early if the function call isn't relevant
+
 	HAL_StatusTypeDef status;
 
-	//read the ALERT_STATUS_1 and ALERT_STATUS_1_MASK regs and bitwise AND them together
+	//read ALERT_STATUS_1 and ALERT_STATUS_1_MASK (invert this) and bitwise AND them together
 	//left with the interrupt sources that we care about
 	uint8_t alert_regs[2]; //goes STATUS, then MASK
 	status = i2c_read_regs(STUSB_ADDR, ALERT_STATUS_1_REG, 2, alert_regs);
 	if(status != HAL_OK) return status;
 	Alt_S1Reg_Map alert_sources;
-	alert_sources = alert_regs[0] & alert_regs[1];
+	alert_sources.data = alert_regs[0] & ~alert_regs[1]; //invert since 0 UNmasks the interrupt
 
 	//if there's an alert due to a hard reset
 	if(alert_sources.map.hreset_mask) {
-		//simulate unplugging and plugging the cable back in again
-		status = pd_onDetach();
-		if(status != HAL_OK) return status;
-		status = pd_onAttach();
-		if(status != HAL_OK) return status;
+		printf("Received Hard Reset!\n");
+		//just let the chip deassert attach and reassert it
+		//should take care of things itself
+		// I THINK??? (i hope lol)
 	}
 
 	//if there's some event involving VBUS
 	if(alert_sources.map.tcmon_mask) {
+		printf("VBus Event!\n");
 		uint8_t tcmon_regs[2];
 		status = i2c_read_regs(STUSB_ADDR, TYPEC_MON_STATUS_0_REG, 2, tcmon_regs);
 		if(status != HAL_OK) return status;
@@ -255,6 +259,7 @@ HAL_StatusTypeDef pd_onAlert() {
 
 	//if there's some hardware fault with the CC lines
 	if(alert_sources.map.ccfault_mask) {
+		printf("CC Fault Event!\n");
 		uint8_t ccfault_regs[2];
 		status = i2c_read_regs(STUSB_ADDR, CC_FAULT_STATUS_0_REG, 2, ccfault_regs);
 		if(status != HAL_OK) return status;
@@ -264,6 +269,7 @@ HAL_StatusTypeDef pd_onAlert() {
 
 	//if there's a protocol event
 	if(alert_sources.map.prt_mask) {
+
 		//read from the protocol status register
 		uint8_t prt_reg;
 		status = i2c_read_reg(STUSB_ADDR, PROTOCOL_STATUS_REG, &prt_reg);
@@ -271,6 +277,8 @@ HAL_StatusTypeDef pd_onAlert() {
 
 		//if we've received a new message from the source
 		if(prt_reg & PRTL_MESSAGE_RECEIVED) {
+			//printf("Message Received!\n");
+
 			//read the RX_HEADER registers
 			uint8_t header_regs[2];
 			PDHeaderTypedef header;
@@ -278,26 +286,55 @@ HAL_StatusTypeDef pd_onAlert() {
 			if(status != HAL_OK) return status;
 			header.data = (header_regs[1] << 8) | header_regs[0];
 
+			//printf("\tHeader: 0x%x\n", header.data);
+
 			//determine if the header is a data or control message
 			if(header.map.num_objects == 0) {
 				//control message
 				//simply update the flag variables here
 				if(header.map.message_type == CONTROL_ACCEPT) {
 					accept_received = true;
+					//printf("Received an Accept!\n");
 				} else if(header.map.message_type == CONTROL_REJECT) {
 					reject_received = true;
+					//printf("Received a Reject\n");
 				} else if(header.map.message_type == CONTROL_PSRDY) {
 					psready_received = true;
+					//printf("Supply ready\n");
 				}
 			} else {
 				//data message
 				//if it's a source capabiliites message
 				if(header.map.message_type == DATA_SOURCECAP) {
-					//TODO: finish this stuff
-				}
-			}
-		}
-	}
+					//read the number of bytes received
+					uint8_t num_objects;
+					num_objects = header.map.num_objects;
+
+					//read the received data objects
+					// 4 bytes per object
+					uint8_t rx_data_objects[28];
+					status = i2c_read_regs(STUSB_ADDR, RX_DATA_OBJ_REG, 28/*num_objects << 2*/, rx_data_objects);
+					if(status != HAL_OK) return status;
+
+					//stitch the PDOs together and store them into the static pdo array
+					for(int i = 0; i < num_objects; i++) {
+						source_pdos[i].data = 	(rx_data_objects[(i<<2)]) |
+												(rx_data_objects[(i<<2) + 1] << 8)  |
+												(rx_data_objects[(i<<2) + 2] << 16) |
+												(rx_data_objects[(i<<2) + 3] << 24);
+					}
+
+					num_source_pdos = num_objects; //and update the `num_source_pdos` as well
+					pdo_received = true; //update the flag
+
+					printf("Received PDOs!\n");
+
+				} //source capabilities
+			} //data message
+		} //protocol event message received
+	} //protocol event
+
+	return status;
 }
 
 /*

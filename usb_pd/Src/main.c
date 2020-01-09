@@ -69,6 +69,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stusb_regdefs.h"
+#include "stusb4500.h"
 #include "printf_override.h"
 #include "stdbool.h"
 /* USER CODE END Includes */
@@ -92,6 +93,7 @@
 
 /* USER CODE BEGIN PV */
 bool last_attach;
+bool int_enable = true;
 UART_HandleTypeDef huart2;
 
 /* USER CODE END PV */
@@ -140,15 +142,6 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("\r\nStarting...\r\n");
-  printf("Read DEVICE_ID: ");
-  i2c_print_reg(STUSB_ADDR, DEVICE_ID_REG);
-
-  Alt_S1Reg_Map alert;
-  alert.data = 0xFF;
-  alert.map.prt_mask = 0;
-  i2c_write_reg(STUSB_ADDR, ALERT_STATUS_1_MASK_REG, alert.data);
-  printf("ALERT_STATUS_1_MASK_REG");
-  i2c_print_reg(STUSB_ADDR, ALERT_STATUS_1_MASK_REG);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -160,6 +153,34 @@ int main(void)
 		  printf("Attach Line High!\n");
 	  } else if (!current_attach && last_attach) {
 		  printf("Attach Line Low!\n");
+
+		  HAL_Delay(1000);
+		  pd_send_soft_reset(); //have source resend PDOs
+
+		  uint8_t num_pdos;
+		  PDOTypedef pdos[8];
+		  pd_get_source_pdos(&num_pdos, pdos);
+		  printf("Number of PDOs Available: %d\n", num_pdos);
+		  for(int i = 0; i < num_pdos; i++) {
+			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  }
+
+		  pd_read_sink_pdos(&num_pdos, pdos);
+		  printf("Number of sink PDOs: %d\n", num_pdos);
+		  for(int i = 0; i < num_pdos; i++) {
+			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  }
+
+		  HAL_Delay(5000);
+		  //pd_update_num_pdos(2);
+		  //pd_send_soft_reset();
+		  pd_request_pdo_num(2);
+		  pd_read_sink_pdos(&num_pdos, pdos);
+		  printf("Number of sink PDOs: %d\n", num_pdos);
+		  for(int i = 0; i < num_pdos; i++) {
+			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  }
+		  pd_send_soft_reset();
 	  }
 	  last_attach = current_attach;
     /* USER CODE END WHILE */
@@ -211,31 +232,16 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin==ATTACH_Pin && !HAL_GPIO_ReadPin(ATTACH_GPIO_Port, GPIO_Pin)) //x:0-15
-    {
-    	HAL_Delay(5);
-        printf("Interrupt!\r\n");
-        printf("ALERT_STATUS_1_REG");
-		i2c_print_reg(STUSB_ADDR, ALERT_STATUS_1_REG);
-		printf("PORT_STATUS_0_REG");
-		i2c_print_reg(STUSB_ADDR, PORT_STATUS_0_REG);
-		printf("PORT_STATUS_1_REG");
-		i2c_print_reg(STUSB_ADDR, PORT_STATUS_1_REG);
+    if (GPIO_Pin == ATTACH_Pin) {
+    	if(!HAL_GPIO_ReadPin(ATTACH_GPIO_Port, GPIO_Pin)) { //x:0-15
+    		pd_onAttach(); //will automatically time out if this is unsuccessful
+    	} else {
+    		pd_onDetach(); //only runs when a source has been attached
+    	}
+    }
 
-		//read up to PRT_STATUS to clear interrupt line
-		for(int i = 0; i < 12; i++) {
-			uint8_t throwaway;
-			i2c_read_reg(STUSB_ADDR, ALERT_STATUS_1_REG + i, &throwaway);
-		}
-
-		CC_Reg_Map cc_reg;
-		i2c_read_reg(STUSB_ADDR, CC_STATUS_REG, &cc_reg.data);
-
-		printf("\n\r");
-		printf("CC1 Status: %d \n\r", cc_reg.map.cc1);
-		printf("CC2 Status: %d \n\r", cc_reg.map.cc2);
-		printf("Sink(1), Source(0): %d \n\r", cc_reg.map.conn_res);
-		printf("Searching?: %d \n\r", cc_reg.map.looking);
+    if (GPIO_Pin == USB_ALT_Pin) {
+    	pd_onAlert();
     }
 }
 /* USER CODE END 4 */

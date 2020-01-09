@@ -67,6 +67,7 @@ void Error_Handler(void);
 #define ATTACH_EXTI_IRQn EXTI0_1_IRQn
 #define USB_ALT_Pin GPIO_PIN_15
 #define USB_ALT_GPIO_Port GPIOB
+#define USB_ALT_EXTI_IRQn EXTI4_15_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -1,0 +1,14 @@
+stusb4500.c:16:19:pd_init	32	static
+stusb4500.c:42:19:pd_soft_reset	32	static
+stusb4500.c:61:19:pd_send_soft_reset	24	static
+stusb4500.c:76:19:pd_read_sink_pdos	80	dynamic
+stusb4500.c:103:19:pd_get_source_pdos	24	static
+stusb4500.c:112:19:pd_read_rdo	40	static
+stusb4500.c:124:19:pd_update_sink_pdo	24	static
+stusb4500.c:147:19:pd_update_num_pdos	16	static
+stusb4500.c:155:19:pd_typec_info	16	static
+stusb4500.c:160:19:pd_request_pdo_num	48	static
+stusb4500.c:186:6:pd_attached	8	static
+stusb4500.c:190:19:pd_onAttach	24	static
+stusb4500.c:216:19:pd_onDetach	16	static
+stusb4500.c:227:19:pd_onAlert	80	static

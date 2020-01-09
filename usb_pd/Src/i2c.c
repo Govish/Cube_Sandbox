@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -167,9 +167,9 @@ HAL_StatusTypeDef i2c_read_regs(uint8_t addr, uint8_t reg_start, uint8_t num_reg
 	HAL_StatusTypeDef status;
 	if(BUS_IN_USE) return HAL_BUSY;
 	BUS_IN_USE = 1; //lock the bus
-	status = HAL_I2C_Master_Transmit(&hi2c2, addr, read_data, 1, 1); //1ms timeout
-	if(status == HAL_OK) status = HAL_I2C_Master_Receive(&hi2c2, addr, read_data, num_regs, num_regs>>2); //500us per byte, should be plenty even at 100khz
-	else BUS_IN_USE = 0; //unlock the bus
+	status = HAL_I2C_Master_Transmit(&hi2c2, addr, &reg_start, 1, 1); //1ms timeout
+	if(status == HAL_OK) status = HAL_I2C_Master_Receive(&hi2c2, addr, read_data, num_regs, num_regs); //1ms per byte, should be plenty even at 100khz
+	BUS_IN_USE = 0; //unlock the bus
 	return status;
 }
 
@@ -177,7 +177,7 @@ HAL_StatusTypeDef i2c_write_regs(uint8_t addr, uint8_t* data_to_write, uint8_t l
 	HAL_StatusTypeDef status;
 	if(BUS_IN_USE) return HAL_BUSY;
 	BUS_IN_USE = 1; //lock the bus
-	status = HAL_I2C_Master_Transmit(&hi2c2, addr, data_to_write, len, len>>2); //500us per byte, should be plenty even at 100khz
+	status = HAL_I2C_Master_Transmit(&hi2c2, addr, data_to_write, len, len); //1ms per byte, should be plenty even at 100khz
 	BUS_IN_USE = 0; //unlock the bus
 	return status;
 }
