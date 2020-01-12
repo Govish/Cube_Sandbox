@@ -148,41 +148,67 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  bool current_attach = HAL_GPIO_ReadPin(ATTACH_GPIO_Port, ATTACH_Pin);
-	  if(current_attach && !last_attach) {
-		  printf("Attach Line High!\n");
-	  } else if (!current_attach && last_attach) {
-		  printf("Attach Line Low!\n");
+	  //we just got attached
+	  if(!last_attach && pd_attached()) {
+		  printf("Starting Negotiation!\n");
+		  float voltage, current, power;
+		  HAL_StatusTypeDef status;
 
-		  HAL_Delay(1000);
-		  pd_send_soft_reset(); //have source resend PDOs
-
-		  uint8_t num_pdos;
-		  PDOTypedef pdos[8];
-		  pd_get_source_pdos(&num_pdos, pdos);
-		  printf("Number of PDOs Available: %d\n", num_pdos);
-		  for(int i = 0; i < num_pdos; i++) {
-			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  status = pd_auto_nego(&voltage, &current, &power);
+		  if(status == HAL_OK) {
+			  printf("Negotiation Successful!\n");
+			  //https://stackoverflow.com/questions/28334435/stm32-printf-float-variable
+			  printf("\tVoltage: %.2f\n", voltage); //had to add "-u _printf_float" to linker flags
+			  printf("\tCurrent: %.2f\n", current);
+			  printf("\tPower: %.2f\n", power);
 		  }
-
-		  pd_read_sink_pdos(&num_pdos, pdos);
-		  printf("Number of sink PDOs: %d\n", num_pdos);
-		  for(int i = 0; i < num_pdos; i++) {
-			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  else if(status == HAL_TIMEOUT) {
+			  printf("Negotiation Timed Out!\n");
 		  }
-
-		  HAL_Delay(5000);
-		  //pd_update_num_pdos(2);
-		  //pd_send_soft_reset();
-		  pd_request_pdo_num(2);
-		  pd_read_sink_pdos(&num_pdos, pdos);
-		  printf("Number of sink PDOs: %d\n", num_pdos);
-		  for(int i = 0; i < num_pdos; i++) {
-			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+		  else if(status == HAL_BUSY) {
+			  printf("Negotiation returned busy\n");
 		  }
-		  pd_send_soft_reset();
+		  else if(status == HAL_ERROR) {
+			  printf("Negotiation Error!\n");
+		  }
 	  }
-	  last_attach = current_attach;
+	  last_attach = pd_attached();
+
+//	  bool current_attach = HAL_GPIO_ReadPin(ATTACH_GPIO_Port, ATTACH_Pin);
+//	  if(current_attach && !last_attach) {
+//		  printf("Attach Line High!\n");
+//	  } else if (!current_attach && last_attach) {
+//		  printf("Attach Line Low!\n");
+//
+//		  HAL_Delay(1000);
+//		  pd_send_soft_reset(); //have source resend PDOs
+//
+//		  uint8_t num_pdos;
+//		  PDOTypedef pdos[8];
+//		  pd_get_source_pdos(&num_pdos, pdos);
+//		  printf("Number of PDOs Available: %d\n", num_pdos);
+//		  for(int i = 0; i < num_pdos; i++) {
+//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+//		  }
+//
+//		  pd_read_sink_pdos(&num_pdos, pdos);
+//		  printf("Number of sink PDOs: %d\n", num_pdos);
+//		  for(int i = 0; i < num_pdos; i++) {
+//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+//		  }
+//
+//		  HAL_Delay(5000);
+//		  //pd_update_num_pdos(2);
+//		  //pd_send_soft_reset();
+//		  pd_request_pdo_num(2);
+//		  pd_read_sink_pdos(&num_pdos, pdos);
+//		  printf("Number of sink PDOs: %d\n", num_pdos);
+//		  for(int i = 0; i < num_pdos; i++) {
+//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
+//		  }
+//		  pd_send_soft_reset();
+//	  }
+//	  last_attach = current_attach;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

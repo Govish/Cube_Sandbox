@@ -5,6 +5,20 @@
 #include "stusb_regdefs.h"
 #include "stdbool.h"
 
+#define NEGO_NUM_RETRIES 5 //in our auto-negotiate function, try to receive PDOs this many times
+#define NEGO_WAIT_TIME 2000 //this is how long we wait before we call a timeout
+
+//======== these should really in the charger file but putting them here for now =========
+#define CHARGER_FSW 500000 //500khz switching frequency for the charger boost converter
+#define L_INDUCTOR 22e-6 //22uH main inductor
+#define BATTERY_FLOAT_V 42.0 //42v float voltage of battery
+#define DIODE_VF 0.65 //forward voltage of schottky rectifier diode
+#define CHI_MIN 0.2
+#define CHI_MAX 0.4
+
+#define MIN_CHARGE_CURRENT 0.460 //~c/10 minimum charging current
+#define MIN_CHARGE_POWER (MIN_CHARGE_CURRENT * BATTERY_FLOAT_V) //need to make sure the charger can supply this much power at least
+
 typedef enum {
 	SUPPLY_FIXED = 0b00, SUPPLY_BATT = 0b01, SUPPLY_VAR = 0b10, SUPPLY_APDO = 0b11
 } PDOSupplyType;
@@ -36,6 +50,10 @@ typedef union {
 		uint32_t Max_Voltage : 10;
 		uint8_t Battery : 2;
 	} battery;
+	struct {
+		uint32_t filler : 30;
+		uint8_t identifier : 2;
+	} type;
 } PDOTypedef;
 
 /*

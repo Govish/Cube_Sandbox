@@ -179,9 +179,164 @@ HAL_StatusTypeDef pd_request_pdo_num(uint8_t pdo_index) {
 	return pd_send_soft_reset();
 }
 
-/* TODO: write pd_auto_nego function! */
-HAL_StatusTypeDef pd_auto_nego(float* voltage, float* current, float* power);	//call this to automatically negotiate a contract
-																				//type C device must be attached for nego to be successful
+/* TODO: write pd_auto_nego function! (namely how retries work) */
+//call this to automatically negotiate a contract
+//type C device must be attached for nego to be successful
+HAL_StatusTypeDef pd_auto_nego(float* voltage, float* current, float* power) {
+	HAL_Delay(NEGO_WAIT_TIME); //wait for the source to chill out for a little
+
+	/* ========= prepare to negotiate ========= */
+	HAL_StatusTypeDef status;
+	pdo_received = false; //clear the PDO received flag
+	uint8_t retry_counter = NEGO_NUM_RETRIES;
+	uint32_t timeout_counter = HAL_GetTick();
+
+	/* ========== Actually do the negotiation, with finite retries and timeouts =========== */
+	while(true) {
+		//send a soft reset
+		status = pd_send_soft_reset();
+		if(status != HAL_OK) return status;
+
+		//do nothing until we either receive a PDO or timeout
+		while(!pdo_received && (HAL_GetTick() - timeout_counter) < NEGO_WAIT_TIME);
+
+		//if we received a PDO, break from this loop
+		if(pdo_received) break;
+
+		//decrement the retry counter, return a timeout if we retry too many times
+		retry_counter--;
+		if(retry_counter == 0) return HAL_TIMEOUT;
+	}
+
+	/* ======= if we've made it this far, we have PDOs to parse through ======= */
+	//the first PDO is always 5V and has some weird readouts
+	//so we'll just never charge if we only have a single PDO
+	if(num_source_pdos <= 1) return HAL_TIMEOUT;
+
+	//iterate over all the PDOs except the first one
+	int8_t select_pdo_index = -1; //our "invalid" signal
+	float max_power = -1; //holds the peak power that we can draw from the source
+	//defining a bunch floating point numbers again
+	float pdo_voltage, pdo_vmin, pdo_vmax, pdo_current, pdo_power, duty_cycle, i_ripple, chi, chi_min, chi_max;
+	for(int i = 1; i < num_source_pdos; i++) {
+		PDOTypedef pdo = source_pdos[i]; //just kinda convenient to manipulate the pdo this way
+
+		//A valid PDO will have a minimum power (so that we have a high enough charge current)
+		//and the inductor current and the ripple current have to be within a certain ratio
+		//this ratio is called the Chi Factor, and should be between 0.2 and 0.4
+		//	(see page 14 of this datasheet: https://www.analog.com/media/en/technical-documentation/data-sheets/3783fb.pdf)
+		//in our case, inductor average current is our PDO current
+		//and our ripple current is a function of some converter constants and PDO voltage
+
+ 		//treat the different pdo types differently
+		switch(pdo.type.identifier) {
+		case SUPPLY_FIXED :
+			pdo_voltage = pdo.fixed.Voltage * 0.05; //1 LSB -> 50mV
+			pdo_current = pdo.fixed.Current * 0.01; //1 LSB -> 10mA
+
+			//calculate chi factor
+			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_voltage)/(BATTERY_FLOAT_V + DIODE_VF);
+			i_ripple = (pdo_voltage*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+			chi = i_ripple/pdo_current;
+
+			//calculate PDO power
+			pdo_power = pdo_voltage * pdo_current;
+
+			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
+			if(	chi >= CHI_MIN && chi <= CHI_MAX &&
+				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
+				//if it is, remember this index and the power level
+				select_pdo_index = i;
+				max_power = pdo_power;
+			}
+			break;
+
+		case SUPPLY_BATT :
+			pdo_vmin = pdo.battery.Min_Voltage * 0.05; //1 LSB -> 50mV
+			pdo_vmax = pdo.battery.Max_Voltage * 0.05; //1 LSB -> 50mV
+			pdo_power = pdo.battery.Operating_Power * 0.25; //1 LSB -> 250mW
+
+			//calculate chi factors for the minimum and maximum voltages respectively
+			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
+			i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+			chi_min = i_ripple/(pdo_power/pdo_vmin); //conservative estimate
+			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
+			i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+			chi_max = i_ripple/(pdo_power/pdo_vmax); //conservative estimate
+
+			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
+			if(	chi_min >= CHI_MIN && chi_max <= CHI_MAX &&
+				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
+				//if it is, remember this index and the power level
+				select_pdo_index = i;
+				max_power = pdo_power;
+			}
+			break;
+
+		case SUPPLY_VAR :
+			pdo_vmin = pdo.variable.Min_Voltage * 0.05; //1 LSB -> 50mV
+			pdo_vmax = pdo.variable.Max_Voltage * 0.05; //1 LSB -> 50mV
+			pdo_current = pdo.variable.Operating_Current * 0.01; //1 LSB -> 10mA
+
+			//calculate chi factors for the minimum and maximum voltages respectively
+			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
+			i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+			chi_min = i_ripple/pdo_current;
+			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
+			i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+			chi_max = i_ripple/pdo_current;
+
+			//calculate PDO power conservatively
+			pdo_power = pdo_vmin * pdo_current;
+
+			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
+			if(	chi_min >= CHI_MIN && chi_max <= CHI_MAX &&
+				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
+				//if it is, remember this index and the power level
+				select_pdo_index = i;
+				max_power = pdo_power;
+			}
+			break;
+
+		default : break;
+		}
+	}
+	if(select_pdo_index < 0) return HAL_TIMEOUT; //none of the PDOs worked, so return this
+
+	/* ======= Alright, so we've picked a PDO by now ==== */
+	//reset the accept and reject flags
+	accept_received = false;
+	reject_received = false;
+	status = pd_request_pdo_num(select_pdo_index); //ask for the PDO we picked
+	if(status != HAL_OK) return status;
+
+	//wait for an accept, reject, or a timeout
+	timeout_counter = HAL_GetTick();
+	while((HAL_GetTick() - timeout_counter) < NEGO_WAIT_TIME && !accept_received && !reject_received);
+
+	if(accept_received) {
+		PDOTypedef pdo = source_pdos[select_pdo_index];
+		switch(pdo.type.identifier) {
+		case SUPPLY_FIXED :
+			*voltage = pdo.fixed.Voltage;
+			*current = pdo.fixed.Current;
+			*power = (*voltage) * (*current);
+			return HAL_OK;
+		case SUPPLY_BATT:
+			*voltage = pdo.battery.Min_Voltage; //conservative
+			*power = pdo.battery.Operating_Power;
+			*current = *voltage / pdo.battery.Max_Voltage; //also conservative
+			return HAL_OK;
+		case SUPPLY_VAR:
+			*voltage = pdo.variable.Min_Voltage; //conservative
+			*current = pdo.variable.Operating_Current;
+			*power = (*voltage) * (*current);
+			return HAL_OK;
+		}
+	}
+
+	return HAL_TIMEOUT;
+}
 
 bool pd_attached() {
 	return attached;
@@ -336,30 +491,3 @@ HAL_StatusTypeDef pd_onAlert() {
 
 	return status;
 }
-
-/*
-    if the 1st bit (PRT_STATUS bit) is asserted
-        read the PRT_STATUS register (0x16)
-        if the MSG_RECEIVED bit is asserted (bit 2)
-            read the RX_HEADER registers (2 regs starting at 0x31)
-            if the message is a data message (see tippy top):
-                get the number of data objects from the RX_HEADER (see top as well)
-                    - compare this to the RX_BYTE_COUNT reg >> 2 (0x30) if you wanna verify
-                if it's a SOURCE_CAPABILITIES message (0x01)
-                    real quick read them out from their respective registers
-                    - start at 0x33, each 32 bits long
-                    - end at 0x4E
-                basically ignore all other message types?
-                    - Request (0x02)
-                    - BIST (0x03)
-                    - Sink Capabilities (0x04)
-                    - Battery Status (0x05)
-                    - Alert (0x06)
-                    - Vendor Defined messages (0x0F)
-            else it's a control message
-                don't reeeeeallyyyyy need to pay attention to these, BUT MAYBE:
-                - GotoMin (0x02)
-                - Accept (0x03)
-                - Reject (0x04)
-                - PS_RDY (0x06)
-*/

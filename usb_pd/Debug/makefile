@@ -38,7 +38,7 @@ all: usb_pd.elf secondary-outputs
 
 # Tool invocations
 usb_pd.elf: $(OBJS) $(USER_OBJS) D:\Documents\Cube_Sandbox\usb_pd\STM32F072RBTX_FLASH.ld
-	arm-none-eabi-gcc -o "usb_pd.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\usb_pd\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="usb_pd.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "usb_pd.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\usb_pd\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="usb_pd.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
