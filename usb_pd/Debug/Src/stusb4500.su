@@ -7,9 +7,9 @@ stusb4500.c:112:19:pd_read_rdo	40	static
 stusb4500.c:124:19:pd_update_sink_pdo	24	static
 stusb4500.c:147:19:pd_update_num_pdos	16	static
 stusb4500.c:155:19:pd_typec_info	16	static
-stusb4500.c:160:19:pd_request_pdo_num	48	static
-stusb4500.c:185:19:pd_auto_nego	112	static
-stusb4500.c:340:6:pd_attached	8	static
-stusb4500.c:344:19:pd_onAttach	24	static
-stusb4500.c:370:19:pd_onDetach	16	static
-stusb4500.c:381:19:pd_onAlert	80	static
+stusb4500.c:160:19:pd_request_pdo_num	32	static
+stusb4500.c:185:19:pd_auto_nego	128	static
+stusb4500.c:414:6:pd_attached	8	static
+stusb4500.c:418:19:pd_onAttach	24	static
+stusb4500.c:440:19:pd_onDetach	16	static
+stusb4500.c:451:19:pd_onAlert	80	static

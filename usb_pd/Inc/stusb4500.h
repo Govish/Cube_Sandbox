@@ -1,3 +1,9 @@
+/*
+ * stusb_regdefs.h
+ * Holds general constants and packet formatting relevant for code to interface with STMicroelectronics' STUSB4500 Standalone Negotiator
+ * Source code mostly ported from ST sample code, with some custom mods
+ * I don't entirely know what I'm doing, so don't use this for critical applications without extensive testing
+ */
 #ifndef STUSB4500_H
 #define STUSB4500_H
 
@@ -6,7 +12,7 @@
 #include "stdbool.h"
 
 #define NEGO_NUM_RETRIES 5 //in our auto-negotiate function, try to receive PDOs this many times
-#define NEGO_WAIT_TIME 2000 //this is how long we wait before we call a timeout
+#define NEGO_WAIT_TIME 2000 //this is how long we wait before we call a timeout in ms
 
 //======== these should really in the charger file but putting them here for now =========
 #define CHARGER_FSW 500000 //500khz switching frequency for the charger boost converter
@@ -18,43 +24,6 @@
 
 #define MIN_CHARGE_CURRENT 0.460 //~c/10 minimum charging current
 #define MIN_CHARGE_POWER (MIN_CHARGE_CURRENT * BATTERY_FLOAT_V) //need to make sure the charger can supply this much power at least
-
-typedef enum {
-	SUPPLY_FIXED = 0b00, SUPPLY_BATT = 0b01, SUPPLY_VAR = 0b10, SUPPLY_APDO = 0b11
-} PDOSupplyType;
-
-typedef union {
-	uint32_t data;
-	struct {
-		uint16_t Current : 10;
-		uint16_t Voltage : 10;
-		uint8_t PeakCurrent : 2;
-		uint8_t Reserved : 2;
-		uint8_t Unchuncked_Extended : 1;
-		uint8_t Dual_RoleData : 1;
-		uint8_t Communication : 1;
-		uint8_t Extern_Power : 1;
-		uint8_t SuspendSupported : 1;
-		uint8_t DualRolePower : 1;
-		uint8_t FixedSupply : 2;
-	} fixed;
-	struct {
-		uint16_t Operating_Current : 10;
-		uint16_t Min_Voltage : 10;
-		uint16_t Max_Voltage : 10;
-		uint8_t VariableSupply : 2;
-	} variable;
-	struct {
-		uint32_t Operating_Power : 10;
-		uint32_t Min_Voltage : 10;
-		uint32_t Max_Voltage : 10;
-		uint8_t Battery : 2;
-	} battery;
-	struct {
-		uint32_t filler : 30;
-		uint8_t identifier : 2;
-	} type;
-} PDOTypedef;
 
 /*
  ======================= PDO MESSAGE STRUCTURES ====================
@@ -114,7 +83,47 @@ typedef union {
     BITS 29:20      Max voltage (1-bit = 50mV)
     BITS 19:10      Min voltage (1-bit = 50mV)
     BITS 9:0        Operational power (1-bit = 250mW)
+*/
 
+typedef enum {
+	SUPPLY_FIXED = 0b00, SUPPLY_BATT = 0b01, SUPPLY_VAR = 0b10, SUPPLY_APDO = 0b11
+} PDOSupplyType;
+
+//have to be careful with the types of the bitfields--uint16_t's didn't work
+typedef union {
+	uint32_t data;
+	struct {
+		uint32_t Current : 10;
+		uint32_t Voltage : 10;
+		uint8_t PeakCurrent : 2;
+		uint8_t Reserved : 2;
+		uint8_t Unchuncked_Extended : 1;
+		uint8_t Dual_RoleData : 1;
+		uint8_t Communication : 1;
+		uint8_t Extern_Power : 1;
+		uint8_t SuspendSupported : 1;
+		uint8_t DualRolePower : 1;
+		uint8_t FixedSupply : 2;
+	} fixed;
+	struct {
+		uint32_t Operating_Current : 10;
+		uint32_t Min_Voltage : 10;
+		uint32_t Max_Voltage : 10;
+		uint8_t VariableSupply : 2;
+	} variable;
+	struct {
+		uint32_t Operating_Power : 10;
+		uint32_t Min_Voltage : 10;
+		uint32_t Max_Voltage : 10;
+		uint8_t Battery : 2;
+	} battery;
+	struct {
+		uint32_t filler : 30;
+		uint8_t identifier : 2;
+	} type;
+} PDOTypedef;
+
+/*
 ========================= RDO MESSAGE STRUCTURES (SINK ONLY) =========================
 
 ##### FIXED AND VARIABLE RDO's #######
@@ -139,8 +148,104 @@ typedef union {
     BIT 23          Unchunked Extended Messages Supported (set to 0)
     BITS 22:20      Reserved (set to 0)
     BITS 19:10      Operating power (1-bit = 250mW)
-    BITS 9:0        Operating power (1-bit = 250mW)
+    BITS 9:0        Max Operating power (1-bit = 250mW)
 */
+
+typedef union {
+	struct {
+		uint32_t max_current : 10;
+		uint32_t op_current : 10;
+		uint8_t irrelevant : 8;
+		uint8_t obj_pos : 3;
+		uint8_t reserved : 1;
+	} fix_var;
+	struct {
+		uint32_t max_power : 10;
+		uint32_t op_power : 10;
+		uint8_t irrelevant : 8;
+		uint8_t obj_pos : 3;
+		uint8_t reserved : 1;
+	} batt;
+	struct {
+		uint32_t irrelevant : 28;
+		uint8_t obj_pos : 3;
+		uint8_t reserved : 1;
+	} index;
+	uint32_t data;
+} RDOTypedef;
+
+/*
+============================ HEADER Structure ============================
+https://www.embedded.com/usb-type-c-and-power-delivery-101-power-delivery-protocol/
+
+    BIT 15      EXTENDED FLAG
+                    1: Extended length PD message
+                    0: Normal length PD message
+    BITS 14:12  NUMBER OF DATA OBJECTS
+                    0: Indicates a control header
+                    1-7: Indicates a data header
+    BITS 11:9   MESSAGE ID
+                    some rolling counter value
+                    not sure if STUSB4500 handles it
+    BIT 8       POWER PORT ROLE
+                    0: SINK
+                    1: SOURCE
+    BIT 7:6     SPEC REVISION
+                    00: Rev 1.0
+                    01: Rev 2.0
+                    10: Rev 3.0
+    BIT 5       DATA ROLE
+                    0: UFP
+                    1: DFP
+    BIT 4:0     MESSAGE TYPE
+                for control messages:
+                    00001: GOODCRC
+                    00010: GOTO_MIN
+                    00011: ACCEPT
+                    00100: REJECT
+                    00101: PING (sink can ignore)
+                    00110: PS_READY
+                    00111: GET_SOURCE_CAPABILITY
+                    01000: GET_SINK_CAPABILITY
+                    01001: DATA_ROLE_SWAP
+                    01010: POWER_ROLE_SWAP
+                    01011: VCONN_SWAP
+                    01100: WAIT
+                    01101: SOFT_RESET
+                    10000: NOT_SUPPORTED
+                    10001: GET_SOURCE_CAPABILITY_EXTENDED
+                    10010: GET_STATUS
+                    10011: FAST_ROLE_SWAP
+                for data messages:
+                    00001: SOURCE_CAPABILITIES
+                    00010: REQUEST
+                    00011: BUILT_IN_SELF_TEST
+                    00100: SINK_CAPABILITIES
+                    00101: BATTERY_STATUS
+                    00110: ALERT
+                    01111: VENDOR_DEFINED
+
+*/
+
+typedef union {
+    uint16_t data;
+    struct {
+        uint8_t message_type : 5; //bits 4:0
+        uint8_t data_role : 1; //bit 5
+        uint8_t spec_rev : 2; //bits 7:6
+        uint8_t pwr_role : 1; //bit 8
+        uint8_t message_id : 3; //bits 11:9
+        uint8_t num_objects : 3; //bits 14:12
+        uint8_t ext_flag : 1; //bit 15
+    } map;
+} PDHeaderTypedef;
+
+//#define CONTROL_GOTOMIN 0x02
+#define CONTROL_ACCEPT 0x03
+#define CONTROL_REJECT 0x04
+#define CONTROL_PSRDY 0x06
+
+#define DATA_SOURCECAP 0x01
 
 // =========== Public Functions ============
 
@@ -151,7 +256,7 @@ HAL_StatusTypeDef pd_read_sink_pdos(uint8_t* num_pdos, PDOTypedef* pdos);	//read
 																			//pass this a pointer to a char and a pointer to an array of 3 PDOTypedefs
 HAL_StatusTypeDef pd_get_source_pdos(uint8_t* num_pdos, PDOTypedef* pdos);	//read how many pdo's we have received and what they are
 																			//pass this a pointer to a char and a pointer to an array of 8 PDOTypedefs
-HAL_StatusTypeDef pd_read_rdo(PDOTypedef* rdo);	//read the currently active RDO
+HAL_StatusTypeDef pd_read_rdo(RDOTypedef* rdo);	//read the currently active RDO
 HAL_StatusTypeDef pd_update_sink_pdo(uint8_t pdo_index, PDOTypedef* new_pdo); //update the PDO at a particular index
 HAL_StatusTypeDef pd_update_num_pdos(uint8_t num_active_pdos);	//set the number of active PDOs (1-3, values will be constrained)
 HAL_StatusTypeDef pd_typec_info(CC_Reg_Map* infobuf);	//call this to read the CC_STATUS_REGISTER; will have to decipher using struct encodings

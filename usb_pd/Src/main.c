@@ -93,7 +93,6 @@
 
 /* USER CODE BEGIN PV */
 bool last_attach;
-bool int_enable = true;
 UART_HandleTypeDef huart2;
 
 /* USER CODE END PV */
@@ -149,7 +148,8 @@ int main(void)
   while (1)
   {
 	  //we just got attached
-	  if(!last_attach && pd_attached()) {
+	  bool attached = pd_attached(); //read attachment status once per loop -> interrupt safe
+	  if(!last_attach && attached) {
 		  printf("Starting Negotiation!\n");
 		  float voltage, current, power;
 		  HAL_StatusTypeDef status;
@@ -172,43 +172,8 @@ int main(void)
 			  printf("Negotiation Error!\n");
 		  }
 	  }
-	  last_attach = pd_attached();
+	  last_attach = attached;
 
-//	  bool current_attach = HAL_GPIO_ReadPin(ATTACH_GPIO_Port, ATTACH_Pin);
-//	  if(current_attach && !last_attach) {
-//		  printf("Attach Line High!\n");
-//	  } else if (!current_attach && last_attach) {
-//		  printf("Attach Line Low!\n");
-//
-//		  HAL_Delay(1000);
-//		  pd_send_soft_reset(); //have source resend PDOs
-//
-//		  uint8_t num_pdos;
-//		  PDOTypedef pdos[8];
-//		  pd_get_source_pdos(&num_pdos, pdos);
-//		  printf("Number of PDOs Available: %d\n", num_pdos);
-//		  for(int i = 0; i < num_pdos; i++) {
-//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
-//		  }
-//
-//		  pd_read_sink_pdos(&num_pdos, pdos);
-//		  printf("Number of sink PDOs: %d\n", num_pdos);
-//		  for(int i = 0; i < num_pdos; i++) {
-//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
-//		  }
-//
-//		  HAL_Delay(5000);
-//		  //pd_update_num_pdos(2);
-//		  //pd_send_soft_reset();
-//		  pd_request_pdo_num(2);
-//		  pd_read_sink_pdos(&num_pdos, pdos);
-//		  printf("Number of sink PDOs: %d\n", num_pdos);
-//		  for(int i = 0; i < num_pdos; i++) {
-//			  printf("\tPDO number %d: %lx\n", i+1, pdos[i].data);
-//		  }
-//		  pd_send_soft_reset();
-//	  }
-//	  last_attach = current_attach;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

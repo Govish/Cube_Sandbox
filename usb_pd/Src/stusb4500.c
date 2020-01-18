@@ -1,9 +1,16 @@
+/*
+ * stusb4500.c
+ * Source file to interface with STMicroelectronics STUSB4500 USB-PD standalone negotiator
+ * Source code mostly ported from ST sample code, with some custom mods
+ * I don't entirely know what I'm doing, so don't use this for critical applications without extensive testing
+ */
+
 #include "stusb4500.h"
 #include "i2c.h"
 
 //================== PRIVATE VARIABLES ==================
 volatile static uint8_t num_source_pdos = 0; //variable to store how many source PDOs we've read, updated from interrupt context!
-volatile static PDOTypedef source_pdos[8]; //a little buffer to store all those source PDOs, updated from interrupt context!
+volatile static PDOTypedef source_pdos[7]; //a little buffer to store all those source PDOs, updated from interrupt context!
 
 volatile static bool pdo_received; //flag that says if we're received any fresh PDOs
 volatile static bool accept_received; //flag that says if we've received an accept message
@@ -27,7 +34,7 @@ HAL_StatusTypeDef pd_init() {
 	Alt_S1Reg_Map alt_sreg_mask;
 	alt_sreg_mask.data = 0xFF; //mask everything at the start
 	alt_sreg_mask.map.prt_mask = 0; //interrupt when we receive a new protocol message
-	alt_sreg_mask.map.tcmon_mask = 0; //interrupt when vbus crosses an invalid threshold
+	//alt_sreg_mask.map.tcmon_mask = 0; //interrupt when vbus crosses an invalid threshold
 	alt_sreg_mask.map.ccfault_mask = 0; //interrupt when we detect an error on the CC lines
 	alt_sreg_mask.map.hreset_mask = 0; //interrupt when we receive a hard reset
 	status = i2c_write_reg(STUSB_ADDR, ALERT_STATUS_1_MASK_REG, alt_sreg_mask.data);
@@ -77,7 +84,7 @@ HAL_StatusTypeDef pd_read_sink_pdos(uint8_t* num_pdos, PDOTypedef* pdos) {
 	HAL_StatusTypeDef status;
 
 	//read from DPM_PDO_NUMB register (0x70) to find the number of PDO's available
-	//just remember to dereference the pointer to num_pdos correctly!
+	//just remember to dereference the pointer to num_pdos correctly! (note to myself)
 	status = i2c_read_reg(STUSB_ADDR, DPM_PDO_NUMB_REG, num_pdos);
 	if(status != HAL_OK) return status;
 	*num_pdos &= 0x03; //mask only the bottom two bits
@@ -109,7 +116,7 @@ HAL_StatusTypeDef pd_get_source_pdos(uint8_t* num_pdos, PDOTypedef* pdos) {
 	return HAL_OK;
 }
 
-HAL_StatusTypeDef pd_read_rdo(PDOTypedef* rdo) {
+HAL_StatusTypeDef pd_read_rdo(RDOTypedef* rdo) {
 	HAL_StatusTypeDef status;
 
 	uint8_t rdo_data[4];
@@ -179,7 +186,6 @@ HAL_StatusTypeDef pd_request_pdo_num(uint8_t pdo_index) {
 	return pd_send_soft_reset();
 }
 
-/* TODO: write pd_auto_nego function! (namely how retries work) */
 //call this to automatically negotiate a contract
 //type C device must be attached for nego to be successful
 HAL_StatusTypeDef pd_auto_nego(float* voltage, float* current, float* power) {
@@ -190,6 +196,7 @@ HAL_StatusTypeDef pd_auto_nego(float* voltage, float* current, float* power) {
 	pdo_received = false; //clear the PDO received flag
 	uint8_t retry_counter = NEGO_NUM_RETRIES;
 	uint32_t timeout_counter = HAL_GetTick();
+	printf("Starting Negotiation...\n");
 
 	/* ========== Actually do the negotiation, with finite retries and timeouts =========== */
 	while(true) {
@@ -200,141 +207,213 @@ HAL_StatusTypeDef pd_auto_nego(float* voltage, float* current, float* power) {
 		//do nothing until we either receive a PDO or timeout
 		while(!pdo_received && (HAL_GetTick() - timeout_counter) < NEGO_WAIT_TIME);
 
-		//if we received a PDO, break from this loop
-		if(pdo_received) break;
+		//if we received a PDO, skip to the check portion of this loop
+		//don't need to decrement the retry counter and try to hunt for more PDOs
+		if(pdo_received) goto CheckPDO;
 
-		//decrement the retry counter, return a timeout if we retry too many times
+		//decrement the retry counter, and skip the rest of the code, check if we have retried too many times
 		retry_counter--;
-		if(retry_counter == 0) return HAL_TIMEOUT;
-	}
+		printf("No PDOs Received!\n");
+		printf("Retry Counter: %d\n", retry_counter);
+		if(retry_counter == 0) break;
+		timeout_counter = HAL_GetTick(); //reset the timeout counter
+		continue; //skip the rest of the loop so we try to hunt for another PDO
 
-	/* ======= if we've made it this far, we have PDOs to parse through ======= */
-	//the first PDO is always 5V and has some weird readouts
-	//so we'll just never charge if we only have a single PDO
-	if(num_source_pdos <= 1) return HAL_TIMEOUT;
-
-	//iterate over all the PDOs except the first one
-	int8_t select_pdo_index = -1; //our "invalid" signal
-	float max_power = -1; //holds the peak power that we can draw from the source
-	//defining a bunch floating point numbers again
-	float pdo_voltage, pdo_vmin, pdo_vmax, pdo_current, pdo_power, duty_cycle, i_ripple, chi, chi_min, chi_max;
-	for(int i = 1; i < num_source_pdos; i++) {
-		PDOTypedef pdo = source_pdos[i]; //just kinda convenient to manipulate the pdo this way
-
-		//A valid PDO will have a minimum power (so that we have a high enough charge current)
-		//and the inductor current and the ripple current have to be within a certain ratio
-		//this ratio is called the Chi Factor, and should be between 0.2 and 0.4
-		//	(see page 14 of this datasheet: https://www.analog.com/media/en/technical-documentation/data-sheets/3783fb.pdf)
-		//in our case, inductor average current is our PDO current
-		//and our ripple current is a function of some converter constants and PDO voltage
-
- 		//treat the different pdo types differently
-		switch(pdo.type.identifier) {
-		case SUPPLY_FIXED :
-			pdo_voltage = pdo.fixed.Voltage * 0.05; //1 LSB -> 50mV
-			pdo_current = pdo.fixed.Current * 0.01; //1 LSB -> 10mA
-
-			//calculate chi factor
-			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_voltage)/(BATTERY_FLOAT_V + DIODE_VF);
-			i_ripple = (pdo_voltage*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
-			chi = i_ripple/pdo_current;
-
-			//calculate PDO power
-			pdo_power = pdo_voltage * pdo_current;
-
-			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
-			if(	chi >= CHI_MIN && chi <= CHI_MAX &&
-				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
-				//if it is, remember this index and the power level
-				select_pdo_index = i;
-				max_power = pdo_power;
-			}
-			break;
-
-		case SUPPLY_BATT :
-			pdo_vmin = pdo.battery.Min_Voltage * 0.05; //1 LSB -> 50mV
-			pdo_vmax = pdo.battery.Max_Voltage * 0.05; //1 LSB -> 50mV
-			pdo_power = pdo.battery.Operating_Power * 0.25; //1 LSB -> 250mW
-
-			//calculate chi factors for the minimum and maximum voltages respectively
-			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
-			i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
-			chi_min = i_ripple/(pdo_power/pdo_vmin); //conservative estimate
-			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
-			i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
-			chi_max = i_ripple/(pdo_power/pdo_vmax); //conservative estimate
-
-			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
-			if(	chi_min >= CHI_MIN && chi_max <= CHI_MAX &&
-				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
-				//if it is, remember this index and the power level
-				select_pdo_index = i;
-				max_power = pdo_power;
-			}
-			break;
-
-		case SUPPLY_VAR :
-			pdo_vmin = pdo.variable.Min_Voltage * 0.05; //1 LSB -> 50mV
-			pdo_vmax = pdo.variable.Max_Voltage * 0.05; //1 LSB -> 50mV
-			pdo_current = pdo.variable.Operating_Current * 0.01; //1 LSB -> 10mA
-
-			//calculate chi factors for the minimum and maximum voltages respectively
-			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
-			i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
-			chi_min = i_ripple/pdo_current;
-			duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
-			i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
-			chi_max = i_ripple/pdo_current;
-
-			//calculate PDO power conservatively
-			pdo_power = pdo_vmin * pdo_current;
-
-			//check if chi is within range, power is above the minimum acceptable, and greater than our peak recorded power
-			if(	chi_min >= CHI_MIN && chi_max <= CHI_MAX &&
-				pdo_power >= MIN_CHARGE_POWER && pdo_power >= max_power) {
-				//if it is, remember this index and the power level
-				select_pdo_index = i;
-				max_power = pdo_power;
-			}
-			break;
-
-		default : break;
+CheckPDO:
+		printf("Received PDOs! Quantity: %d\n", num_source_pdos);
+		for(int i = 0; i < num_source_pdos; i++) {
+			printf("\tPDO number %d: %lx\n", i+1, source_pdos[i].data);
 		}
-	}
-	if(select_pdo_index < 0) return HAL_TIMEOUT; //none of the PDOs worked, so return this
 
-	/* ======= Alright, so we've picked a PDO by now ==== */
-	//reset the accept and reject flags
-	accept_received = false;
-	reject_received = false;
-	status = pd_request_pdo_num(select_pdo_index); //ask for the PDO we picked
-	if(status != HAL_OK) return status;
+		/* ======= if we've made it this far, we have PDOs to parse through ======= */
+		//the first PDO is always 5V and has some weird readouts
+		//so we'll just never charge if we only have a single PDO
+		if(num_source_pdos <= 1) break;
 
-	//wait for an accept, reject, or a timeout
-	timeout_counter = HAL_GetTick();
-	while((HAL_GetTick() - timeout_counter) < NEGO_WAIT_TIME && !accept_received && !reject_received);
+		//iterate over all the PDOs except the first one
+		int8_t select_pdo_index = -1; //our "invalid" signal
+		float max_power = MIN_CHARGE_POWER; //holds the peak power that we can draw from the source
+			//initializing this to MIN_CHARGE_POWER forces a contract that's higher than this
+		//defining a bunch floating point numbers again
+		float pdo_voltage, pdo_vmin, pdo_vmax, pdo_current, pdo_power;
+		float imin, imax, pmin, pmax, duty_cycle, i_ripple;
+		for(int i = 1; i < num_source_pdos; i++) {
+			PDOTypedef pdo = source_pdos[i]; //just kinda convenient to manipulate the pdo this way
 
-	if(accept_received) {
-		PDOTypedef pdo = source_pdos[select_pdo_index];
-		switch(pdo.type.identifier) {
-		case SUPPLY_FIXED :
-			*voltage = pdo.fixed.Voltage;
-			*current = pdo.fixed.Current;
-			*power = (*voltage) * (*current);
-			return HAL_OK;
-		case SUPPLY_BATT:
-			*voltage = pdo.battery.Min_Voltage; //conservative
-			*power = pdo.battery.Operating_Power;
-			*current = *voltage / pdo.battery.Max_Voltage; //also conservative
-			return HAL_OK;
-		case SUPPLY_VAR:
-			*voltage = pdo.variable.Min_Voltage; //conservative
-			*current = pdo.variable.Operating_Current;
-			*power = (*voltage) * (*current);
-			return HAL_OK;
+			//A valid PDO will have a minimum power (so that we have a high enough charge current)
+			//and the inductor current and the ripple current have to be within a certain ratio
+			//this ratio is called the Chi Factor, and should be between 0.2 and 0.4
+			//	(see page 14 of this datasheet: https://www.analog.com/media/en/technical-documentation/data-sheets/3783fb.pdf)
+			//in our case, inductor average current is our PDO current
+			//and our ripple current is a function of some converter constants and PDO voltage
+
+			//treat the different pdo types differently
+			switch(pdo.type.identifier) {
+			case SUPPLY_FIXED :
+				printf("PDO %d is a FIXED SUPPLY\n", i+1);
+				printf("\tEncoded Voltage: 0x%x\n", pdo.fixed.Voltage);
+				pdo_voltage = pdo.fixed.Voltage * 0.05; //1 LSB -> 50mV
+				pdo_current = pdo.fixed.Current * 0.01; //1 LSB -> 10mA
+
+				printf("\tPDO Voltage: %.2fV\n", pdo_voltage);
+				printf("\tPDO Current: %.2fA\n", pdo_current);
+
+				//calculate minimum and maximum currents from supply voltage
+				duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_voltage)/(BATTERY_FLOAT_V + DIODE_VF);
+				i_ripple = (pdo_voltage*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+				imax = i_ripple/CHI_MIN;
+				imin = i_ripple/CHI_MAX;
+				printf("\tMinimum current given PDO voltage: %.2fA\n", imin);
+				printf("\tMaximum current given PDO voltage: %.2fA\n", imax);
+
+				//compare source capabilities with the current that we want
+				if(pdo_current < imin) break; //current is too low
+				else if (pdo_current > imax) { //if the current is too high
+					if((imax * pdo_voltage) < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = pdo_voltage * imax; //update the maxmimum power that we've found
+						select_pdo_index = i;  // select this PDO
+						source_pdos[i].fixed.Current = (uint32_t)(imax / 0.01); //lower our current requirement to our calc'ed max current
+						break;
+					}
+				}
+				else {
+					if((pdo_current * pdo_voltage) < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = pdo_voltage * pdo_current; //update the maximum power that we've found
+						select_pdo_index = i;  // select this PDO
+						break;
+					}
+				}
+
+			case SUPPLY_BATT :
+				printf("PDO %d is a BATTERY SUPPLY\n", i+1);
+				pdo_vmin = pdo.battery.Min_Voltage * 0.05; //1 LSB -> 50mV
+				pdo_vmax = pdo.battery.Max_Voltage * 0.05; //1 LSB -> 50mV
+				pdo_power = pdo.battery.Operating_Power * 0.25; //1 LSB -> 250mW
+
+				//calculate maximum power for the minimum and maximum chi factors
+				duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
+				i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+				pmax = i_ripple*pdo_vmin/CHI_MIN; //maximum power that we should request from the source
+				duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
+				i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+				pmin = i_ripple*pdo_vmax/CHI_MAX; //minimum power that we should request from the source
+
+				//compare source capabilities with the current that we want
+				if(pdo_power < pmin) break; //power is too low
+				else if (pdo_power > pmax) { //if the power is too high
+					if(pmax < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = pmax; //update the maximum power that we've found
+						select_pdo_index = i;  // select this PDO
+						source_pdos[i].battery.Operating_Power = (uint32_t)(pmax / 0.25); //lower our power requirement to our calc'ed max power
+						break;
+					}
+				}
+				else {
+					if(pdo_power < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = pdo_power;
+						select_pdo_index = i;  // select this PDO
+						break;
+					}
+				}
+
+			case SUPPLY_VAR :
+				printf("PDO %d is a VARIABLE SUPPLY\n", i+1);
+				pdo_vmin = pdo.variable.Min_Voltage * 0.05; //1 LSB -> 50mV
+				pdo_vmax = pdo.variable.Max_Voltage * 0.05; //1 LSB -> 50mV
+				pdo_current = pdo.variable.Operating_Current * 0.01; //1 LSB -> 10mA
+
+				//calculate currents for the minimum and maximum voltages respectively
+				duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmin)/(BATTERY_FLOAT_V + DIODE_VF);
+				i_ripple = (pdo_vmin*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+				imax = i_ripple/CHI_MIN;
+				duty_cycle = (BATTERY_FLOAT_V + DIODE_VF - pdo_vmax)/(BATTERY_FLOAT_V + DIODE_VF);
+				i_ripple = (pdo_vmax*duty_cycle/CHARGER_FSW)/L_INDUCTOR;
+				imin = i_ripple/CHI_MAX;
+
+				//compare source capabilities with the current that we want
+				if(pdo_current < imin) break; //current is too low
+				else if (pdo_current > imax) { //if the current is too high
+					if((imax*pdo_vmin) < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = imax*pdo_vmin; //update the maximum power that we've found
+						select_pdo_index = i;  // select this PDO
+						source_pdos[i].variable.Operating_Current = (uint32_t)(imax/0.01); //lower our power requirement to our calc'ed max power
+						break;
+					}
+				}
+				else {
+					if((pdo_current*pdo_vmin) < max_power) break; //if the maximum power we can use is still too low
+					else {
+						max_power = pdo_vmin*pdo_current;
+						select_pdo_index = i;  // select this PDO
+						break;
+					}
+				}
+
+			default : break;
+			}
+
+			printf("Max power available %.2f from index %d\n", max_power, select_pdo_index + 1);
 		}
-	}
+		if(select_pdo_index < 0) return HAL_TIMEOUT; //none of the PDOs worked, so return this
 
+		/* ======= Alright, so we've picked a PDO by now ==== */
+		printf("Trying to negotiate index %d\n", select_pdo_index+1); //since PDOs are 1-indexed (compared to the array)
+
+		//reset the accept and reject flags
+		accept_received = false;
+		reject_received = false;
+		status = pd_request_pdo_num(select_pdo_index+1); //ask for the PDO we picked
+		if(status != HAL_OK) return status;
+
+		//wait for an accept, reject, or a timeout
+		timeout_counter = HAL_GetTick();
+		while((HAL_GetTick() - timeout_counter) < NEGO_WAIT_TIME && !accept_received && !reject_received);
+
+		if(accept_received) {
+			printf("Accepted Received!\n");
+
+			//grab the RDO that we're using
+			RDOTypedef rdo;
+			status = pd_read_rdo(&rdo);
+			if(status != HAL_OK) return status;
+			printf("Here's the RDO: 0x%lx\n", rdo.data);
+
+			//and grab the PDO that it corresponds to
+			PDOTypedef pdo = source_pdos[rdo.index.obj_pos - 1];
+
+			switch(pdo.type.identifier) {
+			case SUPPLY_FIXED :
+				*voltage = pdo.fixed.Voltage * 0.05;
+				*current = rdo.fix_var.op_current * 0.01;
+				*power = (*voltage) * (*current);
+				return HAL_OK;
+			case SUPPLY_BATT:
+				*voltage = pdo.battery.Min_Voltage * 0.05; //conservative
+				*power = rdo.batt.op_power * 0.25;
+				*current = *power / pdo.battery.Max_Voltage; //also conservative
+				return HAL_OK;
+			case SUPPLY_VAR:
+				*voltage = pdo.variable.Min_Voltage * 0.05; //conservative
+				*current = rdo.fix_var.op_current * 0.01;
+				*power = (*voltage) * (*current);
+				return HAL_OK;
+			}
+		}
+
+		if(reject_received) printf("Reject received!\n");
+		else printf("Accept/Reject Timed Out!\n");
+
+		//if we timed out or got a reject (for some weird reason) retry the negotiation again
+		retry_counter--;
+		if(retry_counter == 0) break;
+		timeout_counter = HAL_GetTick(); //reset the timeout counter if we're retrying again
+	}
+	printf("Negotiation Failed!\n");
 	return HAL_TIMEOUT;
 }
 
@@ -344,10 +423,6 @@ bool pd_attached() {
 
 HAL_StatusTypeDef pd_onAttach() {
 	HAL_StatusTypeDef status;
-
-	//perform a register soft reset of the chip
-	//status = pd_soft_reset();
-	//if(status != HAL_OK) return status;
 
 	//read from the PORT_STATUS_1 register to make sure we're connected to a source
 	uint8_t ps1_reg;
@@ -432,7 +507,6 @@ HAL_StatusTypeDef pd_onAlert() {
 
 		//if we've received a new message from the source
 		if(prt_reg & PRTL_MESSAGE_RECEIVED) {
-			//printf("Message Received!\n");
 
 			//read the RX_HEADER registers
 			uint8_t header_regs[2];
@@ -441,21 +515,16 @@ HAL_StatusTypeDef pd_onAlert() {
 			if(status != HAL_OK) return status;
 			header.data = (header_regs[1] << 8) | header_regs[0];
 
-			//printf("\tHeader: 0x%x\n", header.data);
-
 			//determine if the header is a data or control message
 			if(header.map.num_objects == 0) {
 				//control message
 				//simply update the flag variables here
 				if(header.map.message_type == CONTROL_ACCEPT) {
 					accept_received = true;
-					//printf("Received an Accept!\n");
 				} else if(header.map.message_type == CONTROL_REJECT) {
 					reject_received = true;
-					//printf("Received a Reject\n");
 				} else if(header.map.message_type == CONTROL_PSRDY) {
 					psready_received = true;
-					//printf("Supply ready\n");
 				}
 			} else {
 				//data message
@@ -481,9 +550,6 @@ HAL_StatusTypeDef pd_onAlert() {
 
 					num_source_pdos = num_objects; //and update the `num_source_pdos` as well
 					pdo_received = true; //update the flag
-
-					printf("Received PDOs!\n");
-
 				} //source capabilities
 			} //data message
 		} //protocol event message received
