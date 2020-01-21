@@ -8,7 +8,7 @@
 #ifndef STUSB_REGDEFS_H
 #define STUSB_REGDEFS_H
 
-#define STUSB_ADDR 0x28<<1 //8-bit
+#define STUSB_ADDR (0x28<<1) //8-bit
 #define DEVICE_ID_REG 0x2F
 
 #define CC_STATUS_REG 0x11

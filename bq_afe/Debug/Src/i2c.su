@@ -1,0 +1,9 @@
+i2c.c:30:6:MX_I2C2_Init	8	static
+i2c.c:61:6:HAL_I2C_MspInit	48	static
+i2c.c:91:6:HAL_I2C_MspDeInit	16	static
+i2c.c:117:19:i2c_read_reg	40	static
+i2c.c:127:19:i2c_write_command	40	static
+i2c.c:136:19:i2c_write_reg	40	static
+i2c.c:148:19:i2c_print_reg	40	static
+i2c.c:166:19:i2c_read_regs	40	static
+i2c.c:176:19:i2c_write_regs	48	static

@@ -1,0 +1,6 @@
+bq_afe.c:23:19:afe_init	72	static
+bq_afe.c:85:19:afe_set_vThresholds	32	static
+bq_afe.c:105:19:afe_set_charge	32	static
+bq_afe.c:120:19:afe_set_discharge	32	static
+bq_afe.c:135:19:afe_measure_temps	48	static
+bq_afe.c:158:19:afe_measure_voltages	56	static
