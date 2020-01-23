@@ -7,6 +7,7 @@ typedef union {
 		uint8_t OCD : 1;
 		uint8_t SCD : 1;
 		uint8_t OV : 1;
+		uint8_t UV : 1;
 		uint8_t Override_alt : 1;
 		uint8_t X_ready : 1;
 		uint8_t reserved : 1;

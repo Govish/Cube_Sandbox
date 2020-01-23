@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "printf_override.h"
+#include "bq_afe.h"
 #include "stdbool.h"
 /* USER CODE END Includes */
 
@@ -70,7 +71,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
   
 
@@ -96,12 +96,31 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("\r\nStarting...\r\n");
+  afe_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  float temp1, temp2, bat;
+	  float cell_voltages[10];
+	  HAL_StatusTypeDef status_temp, status_volt;
+
+	  status_temp = afe_measure_temps(&temp1, &temp2);
+	  status_volt = afe_measure_voltages(cell_voltages, &bat);
+
+	  if(status_temp == HAL_OK && status_volt == HAL_OK) {
+		  printf("Temp1: %0.2f degC\n", temp1); //remember to enable -u _printf_float in linker flags
+		  printf("Temp2: %0.2f degC\n", temp2);
+		  printf("Battery Voltage %0.2fmV\n", bat);
+		  for(int i = 0; i < 10; i++) {
+			  printf("\tCell %d: %0.2fmV\n", i+1, cell_voltages[i]);
+		  }
+		  printf("\n");
+	  }
+	  else printf("Can't read from AFE!\n");
+	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 

@@ -19,6 +19,10 @@ static float adc_offset;
 #define KELVIN_OFFSET 273 //kelvin temperature at 0c (useful for beta calculation)
 //also check out this webpage: https://www.thinksrs.com/downloads/programs/therm%20calc/ntccalibrator/ntccalculator.html
 
+//================ Private Function Prototypes ============
+static HAL_StatusTypeDef afe_balance_upper(uint8_t channel_enable);
+static HAL_StatusTypeDef afe_balance_lower(uint8_t channel_enable);
+
 // ================= PUBLIC FUNCTIONS ====================
 HAL_StatusTypeDef afe_init() {
 	HAL_StatusTypeDef status;
@@ -147,7 +151,7 @@ HAL_StatusTypeDef afe_measure_temps(float* ts1, float* ts2) {
 	r_th1 = (THERM_PULLUP * v_th1)/(THERM_VREF - v_th1);
 	r_th2 = (THERM_PULLUP * v_th2)/(THERM_VREF - v_th2);
 
-	//calculate the temperature values from the thermistor resistance
+	//calculate the temperature values from the thermistor resistance using beta equation
 	*ts1 = 1/(1/(THERM_NOM_TEMP + KELVIN_OFFSET) + (1/THERM_BETA) * (float)log((double)r_th1));
 	*ts2 = 1/(1/(THERM_NOM_TEMP + KELVIN_OFFSET) + (1/THERM_BETA) * (float)log((double)r_th2));
 	return HAL_OK;
@@ -174,10 +178,139 @@ HAL_StatusTypeDef afe_measure_voltages(float* vBuffer, float* batBuffer) {
 	return HAL_OK;
 }
 
-/* TODO the rest of this!! */
-HAL_StatusTypeDef afe_sleep();
-HAL_StatusTypeDef afe_shutdown();
+//just shut down the ADC to save power
+HAL_StatusTypeDef afe_sleep() {
+	HAL_StatusTypeDef status;
+
+	//read the system control 1 register
+	SysCtrl1Typedef ctrl1;
+	status = i2c_read_reg(AFE_ADDR, SYS_CTRL_1_REG, &ctrl1.data);
+	if(status != HAL_OK) return status;
+
+	//disable the ADC_EN bit
+	ctrl1.map.ADC_en = 0;
+
+	//rewrite the data to the control1 register
+	return i2c_write_reg(AFE_ADDR, SYS_CTRL_1_REG, ctrl1.data);
+}
+
+//power the ADC back up for normal operation
+HAL_StatusTypeDef afe_wake() {
+	HAL_StatusTypeDef status;
+
+	//read the system control 1 register
+	SysCtrl1Typedef ctrl1;
+	status = i2c_read_reg(AFE_ADDR, SYS_CTRL_1_REG, &ctrl1.data);
+	if(status != HAL_OK) return status;
+
+	//enable the ADC_EN bit
+	ctrl1.map.ADC_en = 1;
+
+	//rewrite the data to the control1 register
+	return i2c_write_reg(AFE_ADDR, SYS_CTRL_1_REG, ctrl1.data);
+}
+
+//make the AFE enter ship mode, disabling the main regulator
+HAL_StatusTypeDef afe_shutdown() {
+	HAL_StatusTypeDef status;
+	SysCtrl1Typedef ctrl1;
+
+	//write 1 -> shutA = 0, shutB = 1
+	ctrl1.map.Shut_A = 0;
+	ctrl1.map.Shut_B = 1;
+	status = i2c_write_reg(AFE_ADDR, SYS_CTRL_1_REG, ctrl1.data);
+	if(status != HAL_OK) return status;
+
+	//write 2 -> shutA = 1, shutB = 0
+	ctrl1.map.Shut_A = 1;
+	ctrl1.map.Shut_B = 0;
+	return i2c_write_reg(AFE_ADDR, SYS_CTRL_1_REG, ctrl1.data);
+}
 
 //================= Functions in an Interrupt Context ==================
-HAL_StatusTypeDef afe_balance();
-HAL_StatusTypeDef afe_onAlert();
+HAL_StatusTypeDef afe_balance(bool* egregious, bool* no_soh, bool* disable_chg) {
+	HAL_StatusTypeDef status = HAL_OK;
+	static uint32_t balance_time;
+	if((HAL_GetTick() - balance_time) > BALANCE_PERIOD) {
+
+		//get all the cell voltages
+		float cell_voltages[10];
+		float batt_voltage;
+		status = afe_measure_voltages(cell_voltages, &batt_voltage);
+		if(status != HAL_OK) return status;
+
+		//hunt for the highest and lowest cell voltages
+		float upper_vmax, lower_vmax, vmin = 5000; //initialize vmin to something ridiculous
+		uint8_t upper_max_cell, lower_max_cell; //indices of the highest voltage cells in the respective banks
+		for(int i = 0; i<5; i++) {
+			//check the bottom cell bank for the lowest and highest cell voltage
+			if(cell_voltages[i] < vmin) vmin = cell_voltages[i]; //compare the lower cell voltage to the lowest recorded
+			if(cell_voltages[i] > lower_vmax) { //compare the lower cell voltage to the highest recorded (in the lower bank)
+				lower_vmax = cell_voltages[i];
+				lower_max_cell = i;
+			}
+
+			//check the top cell bank for the lowest and highest cell voltage
+			if(cell_voltages[i+5] < vmin) vmin = cell_voltages[i+5]; //compare the upper cell voltage to the lowest recorded
+			if(cell_voltages[i+5] > upper_vmax) { //compare the upper cecll voltage to the highest recorded (in the upper bank)
+				upper_vmax = cell_voltages[i+5];
+				upper_max_cell = i+5;
+			}
+		}
+
+		//detect egregious imbalance and "invalid state of health" imbalance
+		*egregious = *egregious || (upper_vmax - vmin > BALANCE_EGREGIOUS) || (lower_vmax - vmin > BALANCE_EGREGIOUS);
+		*no_soh = *no_soh || (upper_vmax - vmin > BALANCE_SOH_THRESHOLD) || (lower_vmax - vmin > BALANCE_SOH_THRESHOLD);
+
+		//and disable charging if cells are too out of balance near the end of the charging process
+		*disable_chg = (upper_vmax > BALANCE_VMAX) || (lower_vmax > BALANCE_VMAX);
+
+		//FINALLY, balance the banks if we're above the minimum balancing voltage
+		//	and there's a big enough voltage difference between cells
+		if(upper_vmax > BALANCE_VMIN && (upper_vmax - vmin) > BALANCE_TOLERANCE) {
+			//upper_max_cell can range from 5-9 (in terms of index)
+			//and the `afe_balance_upper()` function takes a `1` shifted in the appropriate position corresponding to a channel
+			//where 5 corresponds to 1 << 0 and 9 corresponds to 1 << 4
+			status = afe_balance_upper(1 << (upper_max_cell - 5));
+			if(status != HAL_OK) return status;
+		}
+		if(lower_vmax > BALANCE_VMIN && (lower_vmax - vmin) > BALANCE_TOLERANCE) {
+			//see above for description of the parameter
+			//but this time lower_max_cell ranges from 0-4 so we don't need to subtract 5
+			status = afe_balance_lower(1 << (lower_max_cell));
+			if(status != HAL_OK) return status;
+		}
+
+		//update the balance time for the future
+		balance_time = HAL_GetTick();
+	}
+	return status;
+}
+
+HAL_StatusTypeDef afe_onAlert(bool* xready, bool* uv, bool* ov) {
+	HAL_StatusTypeDef status;
+
+	//simply read the SYS_STAT register and decode it, clear the asserted bits after we read them
+	SysStatTypedef dev_stat;
+	status = i2c_read_reg(AFE_ADDR, SYS_STAT_REG, &dev_stat.data);
+	if(status != HAL_OK) return status;
+
+	*xready = dev_stat.map.X_ready;
+	*uv = dev_stat.map.UV;
+	*ov = dev_stat.map.OV;
+
+	//clear all flags
+	dev_stat.data = 0xFF;
+	return i2c_write_reg(AFE_ADDR, SYS_STAT_REG, dev_stat.data);
+}
+
+// ================= PRIVATE FUNCTIONS ==================
+static HAL_StatusTypeDef afe_balance_upper(uint8_t c) {
+	if(c != 16 && c != 8 && c != 4 && c != 2 && c != 1) return HAL_ERROR; //not balancing just a single cell in the bank
+	return i2c_write_reg(AFE_ADDR, CELL_BAL_2_REG, c);
+}
+
+static HAL_StatusTypeDef afe_balance_lower(uint8_t c) {
+	if(c != 16 && c != 8 && c != 4 && c != 2 && c != 1) return HAL_ERROR; //not balancing just a single cell in the bank
+		return i2c_write_reg(AFE_ADDR, CELL_BAL_1_REG, c);
+}

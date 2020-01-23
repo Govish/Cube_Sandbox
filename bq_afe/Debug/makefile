@@ -37,8 +37,8 @@ bq_afe.list \
 all: bq_afe.elf secondary-outputs
 
 # Tool invocations
-bq_afe.elf: $(OBJS) $(USER_OBJS) D:\Documents\STM32\ Projects\bq_afe\STM32F072RBTX_FLASH.ld
-	arm-none-eabi-gcc -o "bq_afe.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\STM32 Projects\bq_afe\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bq_afe.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+bq_afe.elf: $(OBJS) $(USER_OBJS) D:\Documents\Cube_Sandbox\bq_afe\STM32F072RBTX_FLASH.ld
+	arm-none-eabi-gcc -o "bq_afe.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\Cube_Sandbox\bq_afe\STM32F072RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bq_afe.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

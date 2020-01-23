@@ -24,7 +24,8 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr_ex.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h \
  ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart_ex.h ../Inc/i2c.h \
- ../Inc/main.h ../Inc/usart.h ../Inc/gpio.h ../Inc/printf_override.h
+ ../Inc/main.h ../Inc/usart.h ../Inc/gpio.h ../Inc/printf_override.h \
+ ../Inc/bq_afe.h ../Inc/bq_afe_regdefs.h
 
 ../Inc/main.h:
 
@@ -87,3 +88,7 @@ Src/main.o: ../Src/main.c ../Inc/main.h \
 ../Inc/gpio.h:
 
 ../Inc/printf_override.h:
+
+../Inc/bq_afe.h:
+
+../Inc/bq_afe_regdefs.h:
