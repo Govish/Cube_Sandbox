@@ -51,4 +51,7 @@ HAL_StatusTypeDef afe_shutdown();
 HAL_StatusTypeDef afe_balance(bool* egregious, bool* no_soh, bool* disable_chg);
 HAL_StatusTypeDef afe_onAlert(bool* xready, bool* uv, bool* ov); //pass it boolean pointers which the function updates
 
+HAL_StatusTypeDef afe_balance_upper(uint8_t c);
+HAL_StatusTypeDef afe_balance_lower(uint8_t c);
+
 #endif

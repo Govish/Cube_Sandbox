@@ -9,5 +9,5 @@ bq_afe.c:198:19:afe_wake	24	static
 bq_afe.c:214:19:afe_shutdown	24	static
 bq_afe.c:231:19:afe_balance	104	static
 bq_afe.c:290:19:afe_onAlert	40	static
-bq_afe.c:308:26:afe_balance_upper	16	static
-bq_afe.c:313:26:afe_balance_lower	16	static
+bq_afe.c:308:19:afe_balance_upper	16	static
+bq_afe.c:313:19:afe_balance_lower	16	static

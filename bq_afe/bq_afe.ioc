@@ -1,6 +1,8 @@
 #MicroXplorer Configuration settings - do not modify
 File.Version=6
-I2C2.IPParameters=Timing
+I2C2.IPParameters=Timing,Speed,NoStretchMode
+I2C2.NoStretchMode=I2C_NOSTRETCH_DISABLE
+I2C2.Speed=100
 I2C2.Timing=0x00506682
 KeepUserPlacement=false
 Mcu.Family=STM32F0
@@ -49,7 +51,7 @@ PB14.Signal=I2C2_SDA
 PB15.GPIOParameters=GPIO_PuPd,GPIO_Label,GPIO_ModeDefaultEXTI
 PB15.GPIO_Label=AFE_ALT
 PB15.GPIO_ModeDefaultEXTI=GPIO_MODE_IT_FALLING
-PB15.GPIO_PuPd=GPIO_PULLUP
+PB15.GPIO_PuPd=GPIO_PULLDOWN
 PB15.Locked=true
 PB15.Signal=GPXTI15
 PC13.GPIOParameters=GPIO_Label

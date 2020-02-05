@@ -20,8 +20,8 @@ static float adc_offset;
 //also check out this webpage: https://www.thinksrs.com/downloads/programs/therm%20calc/ntccalibrator/ntccalculator.html
 
 //================ Private Function Prototypes ============
-static HAL_StatusTypeDef afe_balance_upper(uint8_t channel_enable);
-static HAL_StatusTypeDef afe_balance_lower(uint8_t channel_enable);
+//static HAL_StatusTypeDef afe_balance_upper(uint8_t channel_enable);
+//static HAL_StatusTypeDef afe_balance_lower(uint8_t channel_enable);
 
 // ================= PUBLIC FUNCTIONS ====================
 HAL_StatusTypeDef afe_init() {
@@ -305,12 +305,12 @@ HAL_StatusTypeDef afe_onAlert(bool* xready, bool* uv, bool* ov) {
 }
 
 // ================= PRIVATE FUNCTIONS ==================
-static HAL_StatusTypeDef afe_balance_upper(uint8_t c) {
+HAL_StatusTypeDef afe_balance_upper(uint8_t c) {
 	if(c != 16 && c != 8 && c != 4 && c != 2 && c != 1) return HAL_ERROR; //not balancing just a single cell in the bank
 	return i2c_write_reg(AFE_ADDR, CELL_BAL_2_REG, c);
 }
 
-static HAL_StatusTypeDef afe_balance_lower(uint8_t c) {
+HAL_StatusTypeDef afe_balance_lower(uint8_t c) {
 	if(c != 16 && c != 8 && c != 4 && c != 2 && c != 1) return HAL_ERROR; //not balancing just a single cell in the bank
-		return i2c_write_reg(AFE_ADDR, CELL_BAL_1_REG, c);
+	return i2c_write_reg(AFE_ADDR, CELL_BAL_1_REG, c);
 }

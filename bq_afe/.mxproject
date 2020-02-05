@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=D:/Documents/STM32 Projects/bq_afe/Inc
+HeaderPath=D:/Documents/Cube_Sandbox/bq_afe/Inc
 HeaderFiles=stm32f0xx_it.h;stm32f0xx_hal_conf.h;main.h;gpio.h;i2c.h;tim.h;usart.h;
-SourcePath=D:/Documents/STM32 Projects/bq_afe/Src
+SourcePath=D:/Documents/Cube_Sandbox/bq_afe/Src
 SourceFiles=stm32f0xx_it.c;stm32f0xx_hal_msp.c;main.c;gpio.c;i2c.c;tim.c;usart.c;
 
 [PreviousLibFiles]

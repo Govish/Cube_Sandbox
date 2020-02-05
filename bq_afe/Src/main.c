@@ -96,7 +96,9 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("\r\nStarting...\r\n");
+  HAL_Delay(1000);
   afe_init();
+  HAL_Delay(5000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,7 +122,34 @@ int main(void)
 		  printf("\n");
 	  }
 	  else printf("Can't read from AFE!\n");
+//	  bool xready, uv, ov;
+//	  HAL_StatusTypeDef status;
+//
+//	  printf("SYS_STAT register: ");
+//	  status = i2c_print_reg(AFE_ADDR, SYS_STAT_REG);
+//	  printf("\tHAL_OK?: %d\n", status == HAL_OK);
+//
+//	  status = afe_onAlert(&xready, &uv, &ov);
+//	  printf("Status Register Contents: XREADY:%d\tUV:%d\tOV:%d\n", xready, uv, ov);
+//	  printf("\tHAL_OK?: %d\n", status == HAL_OK);
+//
+//	  printf("Trying to balance lower\n");
+//	  status = afe_balance_lower((uint8_t)8);
+//	  printf("\tHAL_OK?: %d\n", status == HAL_OK);
+//
+//	  printf("BALANCE_LOWER register: ");
+//	  status = i2c_print_reg(AFE_ADDR, CELL_BAL_1_REG);
+//	  printf("\tHAL_OK?: %d\n", status == HAL_OK);
+//
+//	  HAL_Delay(5000);
+//
+//	  printf("Shutting down AFE\n");
+//	  status = afe_shutdown();
+//	  printf("\tHAL_OK?: %d\n", status == HAL_OK);
+//
 	  HAL_Delay(1000);
+//	  printf("\n");
+//	  while(1);
 
     /* USER CODE END WHILE */
 
